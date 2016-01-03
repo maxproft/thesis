@@ -21,4 +21,16 @@ explain why we get a string of pearls in ion tracks for MCSAS.
 soap films
 viscous fingering
 fractal antennas
+ion tracks - end quite abruptly, and sometimes oscillate. what causes this, can this be extended? - can I use this for my research project?
+spinning neutron stars - when will they collide?
+magnus effect
+viscous fingering/Diffusion Limited Aggregation
+dynamo theory
+bubble over a can, heat it up.
+fractal electronics/antenna
+cellular autonima/conways game of life
+cellular autonima - re fractals
+popping a bubble
+laminar flow
+
 
