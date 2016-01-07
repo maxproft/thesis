@@ -32,5 +32,6 @@ cellular autonima/conways game of life
 cellular autonima - re fractals
 popping a bubble
 laminar flow
-
+magnetohydrodynamics - solar flair, covection currents
+tesla coil applied to atoms (or tesla coils in general)
 
