@@ -5,6 +5,19 @@ supply of energy/mass
 loss of energy/mass
 focusing of energy/mass
 dispersing of energy/mass
+
+
+transition between laminar/nonlaminar flow
+viscous fingering - when does it transition between one state or another
+explain why we get a string of pearls in ion tracks for MCSAS.
+soap film
+cellular autonima
+lightening breakdown to make fractals
+cyclones 
+
+
+
+
 earths magnetic field/fluid mechanics
 Viscous Fingering Fractal
 magnetodynamic
