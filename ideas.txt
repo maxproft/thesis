@@ -14,6 +14,7 @@ soap film
 cellular autonima
 lightening breakdown to make fractals
 cyclones 
+many particles to a soliton - e.g. BECs are made of many particles, and they form a soliton - can this be reversed
 
 
 
@@ -47,4 +48,11 @@ popping a bubble
 laminar flow
 magnetohydrodynamics - solar flair, covection currents
 tesla coil applied to atoms (or tesla coils in general)
+
+
+A dissipative soliton (DS) is a system in which energy/mass enters the system, leaves the system, is focused and is also dispersed. 
+The system will either be in a steady state, or will oscilate, and a deviation will cause the collapse of the system. 
+As an example, a TV can be considered to be a dissipative soliton, and should too much power be put in, it will break. If too little is put in, it won't work; It is only in the sweet spot that you get a functioning TV.
+
+
 
