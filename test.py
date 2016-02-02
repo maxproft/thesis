@@ -1,12 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import os,sys,pylab
+import os
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
 numframes = 100000
 numsave = 100
-subfolder = 'sub22'
+subfolder = 'pulse'
 
 
 
@@ -18,22 +18,25 @@ if not os.path.exists(rootfolder+'/'+subfolder):#making the subfolder, if it doe
 
 
 
-np.seterr(divide='ignore', invalid='ignore')
+#np.seterr(divide='ignore', invalid='ignore')
 
 
 
-beta = 1
-delta = 1
-epsilon = -1-2.5j
-mu = 0.
-nu = 0.
-D = 0.
+beta = 0.08
+delta = -0.1
+epsilon = 0.66
+mu = -0.1
+nu = -0.1
+D = 1
+
+title = "beta="+str(beta) +"delta="+ str(delta) + "epsilon="+ str(epsilon) + "mu="+ str(mu) + "nu="+ str(nu) + "D="+str( D)
 
 
 #dimensions of the box
 dimension = 50
 #number of pixels along each side
 size = 50
+
 
 Tstep = 0.001 #time between frames
 
@@ -59,15 +62,12 @@ def plot(intensity, name='0',subfolder=subfolder):
     cmap = cm.get_cmap('hot_r')
     cs = plt.pcolor(intensity, cmap = cmap)
     cb = plt.colorbar(cs, orientation='vertical')
+    plt.title(title)
     plt.savefig(rootfolder+'/'+subfolder + '/' + str(name)+".png")
 #    plt.show()
     plt.close()
 
 
-
-#    fig, ax = plt.subplots(1)
- #   heatmap = ax.pcolor(intensity, cmap=plt.cm.get_cmap('hot_r'))
-  #  plt.show()
 
 
 for t in range(numframes):
@@ -78,12 +78,21 @@ for t in range(numframes):
     psi = Tstep*(NORMAL*psi + XX*(psiplusx+psiplusy+psiminusx+psiminusy-4*psi)/(Xstep**2) + TWO*psi*np.abs(psi)**2 + FOUR*psi*np.abs(psi)**4) + psi
     if t%int(numframes/numsave)==1:
         print str(int(t*100/numframes))+'%'
-        intensity = np.abs(psi)/np.max(np.abs(psi))
-        #intensity = psi.real#np.abs(psi)/np.max(np.abs(psi))
+        #intensity = np.abs(psi)#/np.max(np.abs(psi))
+        intensity = psi.real
         plot(intensity, name=str(10**(int(np.log10(numframes))+1)+t))
 
-intensity = np.abs(psi)/np.max(np.abs(psi))
+intensity = np.abs(psi)#/np.max(np.abs(psi))
 plot(intensity, name=str(10**(int(np.log10(numframes))+1)+t))
+
+print "sleeping"
+
+import time
+time.sleep(10) # delays for 5 seconds
+
+print "Making the GIF"
+os.system("convert -delay 10 -loop 0 "+rootfolder+'/'+subfolder+'/'+"*.png "+rootfolder+'/'+subfolder+'/'+"output.gif")
+
 
 
 
