@@ -46,7 +46,10 @@ def getgui():
     g.solve['D']=float(g.dic['d1'])+1j*float(g.dic['d2'])
     if not os.path.exists(g.solve['currentfolder']+'/'+g.solve['subfolder']):#making the subfolder, if it doesn't exist
         os.makedirs(g.solve['currentfolder']+'/'+g.solve['subfolder'])
-    makegif()
+    if g.solve['1d2d']=='0':
+        makegif()
+    elif g.solve['1d2d']=='1':
+        make1D()
 
 
 #GUI Input Functions
@@ -119,6 +122,8 @@ if __name__ == "__main__":
     COL+=2
     guinum('giflen', 'Num Frames in .GIF', root, ROW, COL)
     COL-=2
+    ROW+=1
+    guinum('randamp', 'Random Amplitude', root, ROW, COL)
     ROW+=1
     modes_absreal = [('Absolute Value','0'),('Real Part','1')]
     guiradio('absreal', modes_absreal, root, ROW, COL)
