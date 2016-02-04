@@ -1,3 +1,9 @@
+Look for solitons that bifurcate into more solitons that bifurcate
+with this bifurcation, look for frequency between them changing.
+What about a soliton gun - a big soliton that is able to spit out small solitons
+
+Use Wavelets to look for interesting solutions
+
 
 honours
 4 different ingredients

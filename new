@@ -1,6 +1,6 @@
+aa
 solitons in degenerate matter - should we see anything special in the spectrum of these stars?
 solutons that produce mini solitons - e.g. a gun like in conways game of life
-
 
 convert -delay 10 -loop 0 *.png output.gif
 
