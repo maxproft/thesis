@@ -22,12 +22,13 @@ def plot(intensity, title="", name='a'):
     #plt.close()
 
 
-
 def make1D():
     global psi,savelist
     title = "A="+str(g.solve['A']) +"  B="+ str(g.solve['B']) + "  C="+ str(g.solve['C']) + "  D="+ str(g.solve['D'])
     size = int(float(g.solve['xtotal'])/float(g.solve['xstep']))
     psi = np.array([(np.random.rand()-0.5)*float(g.solve['randamp'])+1j*(np.random.rand()-0.5)*float(g.solve['randamp']) for y in range(size)])
+    #psi = np.array([ float(g.solve['randamp'])*np.sin(y*size/(5*6.28))**2+1j*float(g.solve['randamp'])*np.cos(y*size/(5*6.28))**2 for y in range(size)])
+    
     numframes = int(float(g.solve['ttotal'])/float(g.solve['tstep']))
     savelist = (np.array([int(x) for x in np.arange(0,numframes, numframes/(float(g.solve['giflen']) ))])+numframes/(float(g.solve['giflen'])))[3:]
     #I got rid of some of the early numbers, so that we have removed a lot of the noise

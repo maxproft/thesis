@@ -10,6 +10,7 @@ from matplotlib import cm
 import glob as g
 currentfolder = os.getcwd()
 
+np.seterr(all='raise')
 
 try:
     d = pickle.load(open(currentfolder+"/defaults", 'rb'))
