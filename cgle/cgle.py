@@ -5,12 +5,11 @@ import matplotlib.pyplot as plt
 import os,pickle
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-
+#from PIL import Image, ImageTk
 
 import glob as g
 currentfolder = os.getcwd()
 
-np.seterr(all='raise')
 
 try:
     d = pickle.load(open(currentfolder+"/defaults", 'rb'))
@@ -45,6 +44,7 @@ def getgui():
     g.solve['B']=float(g.dic['b1'])+1j*float(g.dic['b2'])
     g.solve['C']=float(g.dic['c1'])+1j*float(g.dic['c2'])
     g.solve['D']=float(g.dic['d1'])+1j*float(g.dic['d2'])
+    g.solve['tpixels']=float(g.solve['tpixels'])-1
     if not os.path.exists(g.solve['currentfolder']+'/'+g.solve['subfolder']):#making the subfolder, if it doesn't exist
         os.makedirs(g.solve['currentfolder']+'/'+g.solve['subfolder'])
     if g.solve['1d2d']=='0':
@@ -78,6 +78,7 @@ def guiradio(varname, MODES, window, ROW, COL):
 
 
 #The GUI
+
 if __name__ == "__main__":
 
     root = Tk()
@@ -86,9 +87,25 @@ if __name__ == "__main__":
 
     ROW=0
     COL=0
+
+    #photo = PhotoImage(file="equation.png")
+    #label=Label(image=photo)
+    #label.image = photo
+    #label.pack()
+    photo = PhotoImage(file = 'equation.png')
+    label1 = Label(root, image=photo)
+    label1.image = photo
+    label1.grid(row = ROW, column = COL, columnspan = 4)
+    
+    ROW+=1
+
     modes_dim = [('2D .GIF','0'),('1D .png','1')]
     guiradio('1d2d', modes_dim, root, ROW, COL)
+    COL+=2
+    modes_absreal = [('Absolute Value','0'),('Real Part','1')]
+    guiradio('absreal', modes_absreal, root, ROW, COL)
     ROW+=1
+    COL-=2
     guinum('a1',"A=",root,ROW,COL)
     COL+=2
     guinum('a2',"+i",root,ROW,COL)
@@ -120,35 +137,42 @@ if __name__ == "__main__":
     COL-=2
     ROW+=1
     guistr('subfolder', 'Subfolder', root, ROW, COL)
+    ROW+=1
+    guinum('tpixels', 'Approx. T Pixels', root, ROW, COL)
     COL+=2
-    guinum('giflen', 'Num Frames in .GIF', root, ROW, COL)
+    guinum('xpixels','Approx. X Pixels',root,ROW,COL)
+    ROW+=1
+    COL-=2
+    modes_trialfunction = [('Noise','0'),('Sech-Pulse','1'),('Generalised Gaussian','2')]
+    guiradio('trialfunction', modes_trialfunction, root, ROW, COL)
+    ROW+=1
+    guinum('par1', 'Amplitude', root, ROW, COL)
+    COL+=2
+    guinum('par2', 'Width', root, ROW, COL)
     COL-=2
     ROW+=1
-    guinum('randamp', 'Random Amplitude', root, ROW, COL)
+    guinum('par3', 'Maxima Position', root, ROW, COL)
+    COL+=2
+    guinum('par4', 'Phase Shift', root, ROW, COL)
+    COL-=2
     ROW+=1
-    modes_absreal = [('Absolute Value','0'),('Real Part','1')]
-    guiradio('absreal', modes_absreal, root, ROW, COL)
-
-
+    guinum('par5', 'Linear Phase Coefficient', root, ROW, COL)
+    COL+=2
+    guinum('par6', 'Chirp Parameter', root, ROW, COL)
+    COL-=2
+    ROW+=1
+    guinum('par7', 'Super Gaussian Width Scaling', root, ROW, COL)
 
 
     
     ROW+=2
-    Button(root, text='Button', command=getgui, font = "Times 16 bold").grid(row=ROW, column = COL, sticky=W, pady=2)
+    Button(root, text='Go!', command=getgui, font = "Times 16 bold").grid(row=ROW, column = COL, pady=2)
     ROW+=1
-    
+
+
+
+
     root.mainloop()
-
-
-
-
-
-
-
-
-
-
-
 
 
 
