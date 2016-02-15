@@ -61,8 +61,11 @@ def make1D():
     g.solve['One Error']=0
     title = "A="+str(g.solve['A']) +"  B="+ str(g.solve['B']) + "  C="+ str(g.solve['C']) + "  D="+ str(g.solve['D'])
     size = int(float(g.solve['xtotal'])/float(g.solve['xstep']))
-    psi = np.array([ TrialFunction((y-size/2.)*float(g.solve['xstep'])-float(g.solve['par3'])) for y in range(size)])
-    
+    if g.solve['trialfunction']=='3':
+        psi = g.solve['psi']
+    else:
+        psi = np.array([ TrialFunction((y-size/2.)*float(g.solve['xstep'])-float(g.solve['par3'])) for y in range(size)])
+    np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder']+'/'+"start.txt", psi.view(float))
     numframes = int(float(g.solve['ttotal'])/float(g.solve['tstep']))
     savelist = (np.array([int(x) for x in np.arange(0,numframes+numframes/(float(g.solve['tpixels'])), numframes/(float(g.solve['tpixels']) ))]))
     #pixelsavelist = (np.array([int(x) for x in np.arange(0,float(g.solve['xtotal'])/float(g.solve['xstep'])+float(g.solve['xtotal']/(float(g.solve['xpixels'])*float(g.solve['xstep']))),float(g.solve['xtotal']/(float(g.solve['xpixels'])*float(g.solve['xstep']))) )]))
@@ -83,8 +86,9 @@ def make1D():
                 return psiplot.real
         else:
             return None
-
+    
     array = np.array([newpsi(N) for N in range(numframes+1)])
+    np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder']+'/'+"end.txt", psi.view(float))
     array = np.array([x for x in array if x is not None])
     plot(array, title,name='1D Array')
 
@@ -94,7 +98,11 @@ def makegif():
     g.solve['One Error']=0
     title = "A="+str(g.solve['A']) +"  B="+ str(g.solve['B']) + "  C="+ str(g.solve['C']) + "  D="+ str(g.solve['D'])
     size = int(float(g.solve['xtotal'])/float(g.solve['xstep']))
-    psi = np.array([[ TrialFunction(((y-size/2.)**2+(x-size/2.)**2)**0.5*float(g.solve['xstep'])-float(g.solve['par3'])) for y in range(size)] for x in range(size)])
+    if g.solve['trialfunction']=='3':
+        psi = g.solve['psi']
+    else:
+        psi = np.array([[ TrialFunction(((y-size/2.)**2+(x-size/2.)**2)**0.5*float(g.solve['xstep'])-float(g.solve['par3'])) for y in range(size)] for x in range(size)])
+    np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder']+'/'+"start.txt", psi.view(float))
     numframes = int(float(g.solve['ttotal'])/float(g.solve['tstep']))
     savelist = (np.array([int(x) for x in np.arange(0,numframes+numframes/(float(g.solve['tpixels'])), numframes/(float(g.solve['tpixels']) ))]))
    #I got rid of some of the early numbers, so that we have removed a lot of the noise
@@ -116,6 +124,7 @@ def makegif():
             elif float(g.solve['absreal'])==1:
                 intensity = psiplot.real
                 plot(intensity, title=title, name=str(10**(int(np.log10(numframes+1))+1)+N))
-    print "Making the GIF"
+    np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder']+'/'+"end.txt", psi.view(float))
+    print("Making the GIF")
     os.system("convert -delay 10 -loop 0 "+g.solve['currentfolder']+'/'+g.solve['subfolder']+'/'+"*.png "+g.solve['currentfolder']+'/'+g.solve['subfolder']+'/'+"output.gif")
 

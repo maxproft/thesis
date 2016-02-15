@@ -1,15 +1,17 @@
 #!/usr/bin/python
-from Tkinter import *
+try:
+    from Tkinter import *
+except:
+    from tkinter import *
 import numpy as np
 import matplotlib.pyplot as plt
-import os,pickle
+import os,pickle,pylab
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-#from PIL import Image, ImageTk
+#from solve import *
 
 import glob as g
 currentfolder = os.getcwd()
-
 
 try:
     d = pickle.load(open(currentfolder+"/defaults", 'rb'))
@@ -28,7 +30,11 @@ g.gui = {x:g.dic[x] for x in g.dic}#This is for gui inputs
 g.solve = {x:g.dic[x] for x in g.dic}#This includes everything, such as A=a1+a2*1j
 
 
-execfile(currentfolder+"/solve.py",globals())
+#execfile(currentfolder+"/solve.py",globals())
+with open("solve.py") as f:
+    code = compile(f.read(), "solve.py", 'exec')
+    exec(code, globals())
+
 
 
 def getgui():
@@ -47,7 +53,14 @@ def getgui():
     g.solve['tpixels']=float(g.solve['tpixels'])-1
     if not os.path.exists(g.solve['currentfolder']+'/'+g.solve['subfolder']):#making the subfolder, if it doesn't exist
         os.makedirs(g.solve['currentfolder']+'/'+g.solve['subfolder'])
-    if g.solve['1d2d']=='0':
+
+    if g.solve['trialfunction']=='3':
+        g.solve['psi'] = np.loadtxt('import.txt').view(complex)
+        if g.solve['psi'].ndim==1:
+            make1D()
+        elif g.solve['psi'].ndim==2:
+            makegif()
+    elif g.solve['1d2d']=='0':
         makegif()
     elif g.solve['1d2d']=='1':
         make1D()
@@ -88,10 +101,6 @@ if __name__ == "__main__":
     ROW=0
     COL=0
 
-    #photo = PhotoImage(file="equation.png")
-    #label=Label(image=photo)
-    #label.image = photo
-    #label.pack()
     photo = PhotoImage(file = 'equation.png')
     label1 = Label(root, image=photo)
     label1.image = photo
@@ -143,7 +152,7 @@ if __name__ == "__main__":
     guinum('xpixels','Approx. X Pixels',root,ROW,COL)
     ROW+=1
     COL-=2
-    modes_trialfunction = [('Noise','0'),('Sech-Pulse','1'),('Generalised Gaussian','2')]
+    modes_trialfunction = [("Import From 'import.txt'" ,'3'),('Noise','0'),('Sech-Pulse','1'),('Generalised Gaussian','2')]
     guiradio('trialfunction', modes_trialfunction, root, ROW, COL)
     ROW+=1
     guinum('par1', 'Amplitude', root, ROW, COL)
