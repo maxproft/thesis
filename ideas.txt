@@ -1,3 +1,6 @@
+GPU - bad if you have lots of conditionals
+
+
 Look for solitons that bifurcate into more solitons that bifurcate
 with this bifurcation, look for frequency between them changing.
 What about a soliton gun - a big soliton that is able to spit out small solitons
