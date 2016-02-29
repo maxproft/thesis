@@ -1,15 +1,17 @@
 #!/usr/bin/python
-from Tkinter import *
+try:
+    from Tkinter import *
+except:
+    from tkinter import *
 import numpy as np
 import matplotlib.pyplot as plt
-import os,pickle
+import os,pickle,pylab
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-
+#from solve import *
 
 import glob as g
 currentfolder = os.getcwd()
-
 
 try:
     d = pickle.load(open(currentfolder+"/defaults", 'rb'))
@@ -28,7 +30,11 @@ g.gui = {x:g.dic[x] for x in g.dic}#This is for gui inputs
 g.solve = {x:g.dic[x] for x in g.dic}#This includes everything, such as A=a1+a2*1j
 
 
-execfile(currentfolder+"/solve.py",globals())
+#execfile(currentfolder+"/solve.py",globals())
+with open("solve.py") as f:
+    code = compile(f.read(), "solve.py", 'exec')
+    exec(code, globals())
+
 
 
 def getgui():
@@ -44,9 +50,20 @@ def getgui():
     g.solve['B']=float(g.dic['b1'])+1j*float(g.dic['b2'])
     g.solve['C']=float(g.dic['c1'])+1j*float(g.dic['c2'])
     g.solve['D']=float(g.dic['d1'])+1j*float(g.dic['d2'])
+    g.solve['tpixels']=float(g.solve['tpixels'])-1
     if not os.path.exists(g.solve['currentfolder']+'/'+g.solve['subfolder']):#making the subfolder, if it doesn't exist
         os.makedirs(g.solve['currentfolder']+'/'+g.solve['subfolder'])
-    makegif()
+
+    if g.solve['trialfunction']=='3':
+        g.solve['psi'] = np.loadtxt('import.txt').view(complex)
+        if g.solve['psi'].ndim==1:
+            make1D()
+        elif g.solve['psi'].ndim==2:
+            makegif()
+    elif g.solve['1d2d']=='0':
+        makegif()
+    elif g.solve['1d2d']=='1':
+        make1D()
 
 
 #GUI Input Functions
@@ -74,6 +91,7 @@ def guiradio(varname, MODES, window, ROW, COL):
 
 
 #The GUI
+
 if __name__ == "__main__":
 
     root = Tk()
@@ -82,9 +100,21 @@ if __name__ == "__main__":
 
     ROW=0
     COL=0
+
+    photo = PhotoImage(file = 'equation.png')
+    label1 = Label(root, image=photo)
+    label1.image = photo
+    label1.grid(row = ROW, column = COL, columnspan = 4)
+    
+    ROW+=1
+
     modes_dim = [('2D .GIF','0'),('1D .png','1')]
     guiradio('1d2d', modes_dim, root, ROW, COL)
+    COL+=2
+    modes_absreal = [('Absolute Value','0'),('Real Part','1')]
+    guiradio('absreal', modes_absreal, root, ROW, COL)
     ROW+=1
+    COL-=2
     guinum('a1',"A=",root,ROW,COL)
     COL+=2
     guinum('a2',"+i",root,ROW,COL)
@@ -116,33 +146,42 @@ if __name__ == "__main__":
     COL-=2
     ROW+=1
     guistr('subfolder', 'Subfolder', root, ROW, COL)
+    ROW+=1
+    guinum('tpixels', 'Approx. T Pixels', root, ROW, COL)
     COL+=2
-    guinum('giflen', 'Num Frames in .GIF', root, ROW, COL)
+    guinum('xpixels','Approx. X Pixels',root,ROW,COL)
+    ROW+=1
+    COL-=2
+    modes_trialfunction = [("Import From 'import.txt'" ,'3'),('Noise','0'),('Sech-Pulse','1'),('Generalised Gaussian','2')]
+    guiradio('trialfunction', modes_trialfunction, root, ROW, COL)
+    ROW+=1
+    guinum('par1', 'Amplitude', root, ROW, COL)
+    COL+=2
+    guinum('par2', 'Width', root, ROW, COL)
     COL-=2
     ROW+=1
-    modes_absreal = [('Absolute Value','0'),('Real Part','1')]
-    guiradio('absreal', modes_absreal, root, ROW, COL)
-
-
+    guinum('par3', 'Maxima Position', root, ROW, COL)
+    COL+=2
+    guinum('par4', 'Phase Shift', root, ROW, COL)
+    COL-=2
+    ROW+=1
+    guinum('par5', 'Linear Phase Coefficient', root, ROW, COL)
+    COL+=2
+    guinum('par6', 'Chirp Parameter', root, ROW, COL)
+    COL-=2
+    ROW+=1
+    guinum('par7', 'Super Gaussian Width Scaling', root, ROW, COL)
 
 
     
     ROW+=2
-    Button(root, text='Button', command=getgui, font = "Times 16 bold").grid(row=ROW, column = COL, sticky=W, pady=2)
+    Button(root, text='Go!', command=getgui, font = "Times 16 bold").grid(row=ROW, column = COL, pady=2)
     ROW+=1
-    
+
+
+
+
     root.mainloop()
-
-
-
-
-
-
-
-
-
-
-
 
 
 
