@@ -1,0 +1,20 @@
+1826 Scott John Russel
+"Wave of translation"
+1873 KdV 1974
+f(t), nL (non linear), Dispersion <- Blood Flow
+1965 Family of solitary waves
+NLSE <- Maxwell's Law, deep water, solitary waves
+Inverse transform scattering technique
+NLSE -> fiber optics, Laser (1970's) => CGLE
+NLSE->Pegregine Solution, 1983
+Split step fourier method
+Non linear fibre optics Agrawal Chapter 5
+1985 Akhmediev Solution 
+1977 Kutsama M Solution
+NLSE (dissipation) + Higher Order Terms (Dissipative)
+
+D<0/D>0 determines whether we have anomylous dispersion or not.
+
+Method of Moments, Hamiltonian
+
+
