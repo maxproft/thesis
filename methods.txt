@@ -1,0 +1,12 @@
+finite difference methods
+split step fourier method - what they have used before - fastest option, at least for NLSE.
+Ablowitz-Ladik - faster than split step for large amplitudes
+inverse scattering transform
+Method of lines
+finite elemnent method
+finite volume method
+spectral method - faster than split step for small amplitudes Fornberg and Whitham
+Meshfree methods
+Domain Decomposition methods
+multigrid methods
+Analytical and numerical aspects of certain nonlinear evolution equations. II. Numerical, nonlinear Schrödinger equation
