@@ -1,5 +1,9 @@
-GPU - bad if you have lots of conditionals
+ideas for types of solitons to look for:
+oscillating to the left and right/around in a circle for 2D
+cellular autonoma
 
+
+GPU - bad if you have lots of conditionals
 
 Look for solitons that bifurcate into more solitons that bifurcate
 with this bifurcation, look for frequency between them changing.

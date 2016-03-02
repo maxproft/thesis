@@ -1,0 +1,21 @@
+What I want to be able to do by the end of my thesis:
+Be able to solve a PDE using split step fourier
+Be able to program in Fortran
+Be able to do parallel computing using OpenCL
+Understand the derivation of CGLE for a couple different physical situations.
+
+
+What I want my project to achieve (what experiement do I want to run):
+Confirm results previously done.
+Use wavelets to find more spiny solitons
+classify new regions of solutions to the CGLE
+
+
+What I have done so far:
+I have solved a PDE using finite difference - it ran into problems from precision errors, it was slow, and generally buggy, especially because of python.
+
+
+Ideas:
+Look at the types of solutions we get under different initial conditions and when these transitions occur.
+
+
