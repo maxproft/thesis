@@ -19,3 +19,10 @@ Ideas:
 Look at the types of solutions we get under different initial conditions and when these transitions occur.
 
 
+
+c++ vs fortran
+http://www.fortran.bcs.org/2012/nm_talk.pdf
+
+photonics encyclopedia - rp-photonics
+
+
