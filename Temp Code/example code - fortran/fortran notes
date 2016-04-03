@@ -1,0 +1,97 @@
+Not case sensitive
+leave 6 blank spaces at the start of each line
+
+To compile run:
+f95 hello.f90
+(it saves it as a.out)
+
+! To comment a line
+; To make a new statement on the same line
+& To continue the current line on the next line
+
+Identifiers (e.g. character, logical, integer, real (single precision), double precision, complex)
+Contains up to 31 characters
+The first character must be a letter when reading a string
+names are case-insensitive
+
+For a string, do:
+Character(LEN=7):: Login
+
+For double precision:
+DOUBLE PRECISION :: X,Y,NUMBER
+
+COMPLEX :: X, CNumber
+
+For logical, the two options are .TRUE and .FALSE
+
+if an identifier is constant throughout, do the following:
+CHARACTER(Len=4), PARAMETER :: name="john"
+CHARACTER(Len=*), PARAMETER :: name="john", other="longer name"
+CHARACTER(Len=4) :: name, other*11 
+!this sets other to have a length of 11
+
+Not equal, .NE or /=
+
+
+if then else:
+IF (i .NE 17) THEN
+      PRINT*,"i><17"
+ELSE
+      PRINT*,"i=17"
+END IF
+
+(you can also use ELSEIF)
+
+
+FOR LOOPS:
+integer::i,n
+DO i=1,n
+END DO
+
+
+To make a 1D array:
+REAL, DIMENSION(3) :: list
+list = (/1.0,2.0,3.0/)
+list =(/ (i,i=1,3) /)
+
+To make a 2D array:
+REAL, Dimension(2,3) :: matrix
+matrix=reshape ((/1.0,2.0,3.0,4.0,5.0,6.0/),(/2,3/))
+The first arguement gives all the elements, the second specifies the size. Note, for the second arguement, 2 specifies the number of rows, and 3 the number of columns, and it fills the columns first. i.e. we get:
+
+matrix = |1.0 3.0 5.0|
+         |2.0 4.0 6.0|
+
+
+matrix multiplication:
+Real, Dimension(3)::V
+real, dimension(2,3)::A
+real, dimension(2)::W
+Integer:: i,j
+
+A=reshape ((/1.0,2.0,3.0,4.0,5.0,6.0/),(/2,3/))
+V = (/1.0,2.0,3.0/)
+
+DO i=1,2
+  w(i)=0.0
+  DO j=1,3
+    W(i)=w(i)+a(i,j)*v(j)
+  END DO
+END DO
+print*, W
+
+
+
+if you want global variables and functions, etc inside a function, then use modules.
+
+you can abort a DO loop by using cycle
+if nested DO loops, you can label them:
+outer: DO i=1,9
+inner: Do j=1,9
+if (j<3) Cycle outer
+end do inner
+End Do outer
+
+
+
+

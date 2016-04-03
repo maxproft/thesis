@@ -1,0 +1,7 @@
+Steps:
+Write function in fortran
+Run the following in terminal:
+f2py -c circle.f90 -m circle
+It will take circle.f90 and save it as circle.so
+In python, just type "import circle" and treat it as any other module.
+

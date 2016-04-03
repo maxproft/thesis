@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo -e "\nRecompiling the Fortran Code"
+#{
+f2py -c FortranCGLE.f -m FortranCGLE
+#} &> /dev/null
+
+python2.7 gui.py
+
