@@ -1,120 +1,118 @@
-      real function circlearea(r)
-      real:: r
-      circlearea = 3.14159*r*r
-      write(*,*) "circlearea"
-      end function circlearea
 
 
-
-      subroutine arr2arr(array,arrsize,arrout,othervar)
-      real, intent(in)::othervar
-      integer, intent(in)::arrsize
-      integer::i
-      Complex, dimension(arrsize),intent(in)::array
-      complex,dimension(arrsize),intent(out)::arrout
+module cgle
+contains
+!This is just to check I know how to make arrays
+      subroutine arr2arr(arrout,othervar,array,arrsize)
+      real, intent(in)::othervar!some real number
+      integer, intent(in)::arrsize!The size of the input/output array
+      Complex, dimension(arrsize),intent(in)::array!The input array
+      complex,dimension(arrsize),intent(out)::arrout!The output array
+      integer::i!used to loop through the array
       do i=1,arrsize
-      arrout(i)=array(i)+othervar
+      arrout(i)=array(i)+othervar!I am just adding a constant to each number of the complex list.
       end do
       arrout=arrout*5
       return
       end subroutine arr2arr
       
       
-
+      
+      
+!Create an array as a waveform progresses in time - this is very dodge at the moment.
       subroutine nextstep(matrixout,timestep,numtimesteps,A,B,C,D, &
       oldstate,xlength)
       Implicit none
-      real, intent(in)::timestep
-
-      Integer,intent(in)::xlength,numtimesteps
-      integer::k,t
-
-
-      complex, dimension(xlength,numtimesteps),intent(out)::matrixout
-
-      Complex, dimension(xlength),intent(in)::oldstate
-      complex, dimension(xlength)::nonlin,fourier,temp,matrixrow
-
-      COMPLEX,intent(in)::A,B,C,D
-      COMPLEX::power,exponential
-
-
+      real, intent(in)::timestep!How large is each timestep
+      Integer,intent(in)::xlength,numtimesteps!length of input array, number of timesteps (total time =numtimesteps*timestep)
+      integer::k,t,j !Used to iterate over lists
+      complex, dimension(xlength,numtimesteps),intent(out)::matrixout!output matrix
+      Complex, dimension(xlength),intent(in)::oldstate!Input matrix
+      complex, dimension(xlength)::nonlin,fourier,temp,matrixrow!nonlinear term, fourier transform term, intermittant term, the ith row of the matrix
+      COMPLEX,intent(in)::A,B,C,D!A,B,C,D used in the CGLE
+      COMPLEX::power,exponential!Used to make understanding the maths below easier
       
-      call nonlinear(nonlin,timestep,C,D,oldstate,xlength)
-      call FFT(fourier,nonlin,xlength)
+      call nonlinear(nonlin,timestep,C,D,oldstate,xlength)!getting the effect of the nonlinear term
+      call FFT(fourier,nonlin,xlength)!taking the fourier transform acting on the above
       power=-B*timestep*3.14159265**2/xlength**2
       
       do t=1,numtimesteps
-
       do k=1,xlength
       exponential=EXP(power*(k-1)**2+A*timestep)
-      temp(k)=exponential*fourier(k)
+      temp(k)=exponential*fourier(k)!Taking the derivative in the frequency domain
       end do
-      call FFTinv(matrixrow,temp,xlength)
+      call FFTinv(matrixrow,temp,xlength)!Going from the frequency domain back to the spacial domain
       
-      do k=1,xlength
-      matrixout(j,t)=matrixrow(k,t)
+      do j=1,xlength
+      matrixout(j,t)=matrixrow(j)!Putting this row onto the output matrix
+      end do
       end do
       return
+      end subroutine nextstep
       
-      contains
-
-
       
+      
+      
+!Doing the nonlinear term of the CGLE
       subroutine nonlinear(nonlinout,timestep,C,D,oldstate,xlength)
       Implicit none
-      Integer,intent(in)::xlength
-      Integer::i
-      Complex, dimension(xlength),intent(in)::oldstate
-      Complex, dimension(xlength),intent(out)::nonlinout
-      COMPLEX,intent(in)::C,D
-      Complex::power
-      real,intent(in)::timestep
+      Integer,intent(in)::xlength!length of input/output array
+      Integer::i!used to iterate over the array
+      Complex, dimension(xlength),intent(in)::oldstate!the input array
+      Complex, dimension(xlength),intent(out)::nonlinout!the output array
+      COMPLEX,intent(in)::C,D!complex numbers used in the CGLE
+      Complex::power!Used to make calculations easier
+      real,intent(in)::timestep!Length of a timestep
       do i=1,xlength
       power=C*ABS(oldstate(i))**2+D*ABS(oldstate(i))**4
-      nonlinout(i)=EXP(power*timestep)
+      nonlinout(i)=EXP(power*timestep)!the effect of the nonlinear term
       end do
       return
       end subroutine nonlinear
-
-
-
+      
+      
+      
+      
+!Do a fast fourier transform
       subroutine fft(fftout, spacial, xlength)
       Implicit none
-      Integer,intent(in)::xlength
-      Integer::i,k
-      Complex, dimension(xlength),intent(in)::spacial
-      Complex, dimension(xlength),intent(out)::fftout
-      complex::power
+      Integer,intent(in)::xlength!length of the input/output array
+      Integer::i,k!used to itterate over the array
+      Complex, dimension(xlength),intent(in)::spacial!input array, spacial domain
+      Complex, dimension(xlength),intent(out)::fftout!output array, frequency domain
+      complex::power!used to make calculations easier
       power=-2*3.1415926*COMPLEX(0.,1.)/xlength
       do k=1,xlength
       do i=1,xlength
-      fftout(k)=fftout(k)+spacial(i)*EXP(power*(k-1)*(i-1))
+      fftout(k)=fftout(k)+spacial(i)*EXP(power*(k-1)*(i-1))!FFT of the input array
       end do
       end do
       return
       end subroutine fft
-
-
+      
+      
+      
+      
+!Do an inverse fast fourier transform
       subroutine fftinv(Inverse,frequency,xlength)
       Implicit none
-      Integer,intent(in)::xlength
-      Integer::n,k
-      Complex, dimension(xlength),intent(in)::frequency
-      Complex, dimension(xlength),intent(out)::inverse
-      Complex::power
+      Integer,intent(in)::xlength!length of the input/output array
+      Integer::n,k!used to iterate over the array
+      Complex, dimension(xlength),intent(in)::frequency!input array, frequency domain
+      Complex, dimension(xlength),intent(out)::inverse!output array, spacial domain
+      Complex::power!used to make calculations easier
       power=2*3.1415926*COMPLEX(0.,1.)/xlength
       do n=1,xlength
       do k=1,xlength
       inverse(n)=inverse(n)+frequency(k)*EXP(power*(k-1)*(n-1))
       end do
-      inverse(n)=inverse(n)/xlength
+      inverse(n)=inverse(n)/xlength!inverse fourier transform
       end do
       return
       end subroutine fftinv
 
+end module cgle
 
-      end subroutine nextstep
 
 
 
