@@ -1,5 +1,12 @@
+!functions in this module:
+!arr2arr(othervar,array)
+!nextstep(timestep,numtimesteps,A,B,C,D,oldstate)
+!nonlinear(timestep,C,D,oldstate)
+!fft(spacial)
+!fftinv(frequency)
 
 
+!I need to put it in a module so I can apply functions/subroutines inside other functions/subroutines.
 module cgle
 contains
 !This is just to check I know how to make arrays
@@ -32,11 +39,19 @@ contains
       COMPLEX,intent(in)::A,B,C,D!A,B,C,D used in the CGLE
       COMPLEX::power,exponential!Used to make understanding the maths below easier
       
-      call nonlinear(nonlin,timestep,C,D,oldstate,xlength)!getting the effect of the nonlinear term
-      call FFT(fourier,nonlin,xlength)!taking the fourier transform acting on the above
-      power=-B*timestep*3.14159265**2/xlength**2
       
-      do t=1,numtimesteps
+      matrixrow=oldstate
+      !This is the initial time row in the array
+      do j=1,xlength
+      matrixout(j,1)=matrixrow(j)
+      end do
+      
+      
+      do t=2,numtimesteps
+      
+      call nonlinear(nonlin,timestep,C,D,matrixrow,xlength)!getting the effect of the nonlinear term
+      call FFT(fourier,nonlin,xlength)!taking the fourier transform acting on the above
+      power=-B*timestep*3.14159265**2/xlength**2!This is only half the power. the other half is below, in the actual exponential.
       do k=1,xlength
       exponential=EXP(power*(k-1)**2+A*timestep)
       temp(k)=exponential*fourier(k)!Taking the derivative in the frequency domain
@@ -63,9 +78,12 @@ contains
       COMPLEX,intent(in)::C,D!complex numbers used in the CGLE
       Complex::power!Used to make calculations easier
       real,intent(in)::timestep!Length of a timestep
+      
+      
       do i=1,xlength
       power=C*ABS(oldstate(i))**2+D*ABS(oldstate(i))**4
-      nonlinout(i)=EXP(power*timestep)!the effect of the nonlinear term
+      nonlinout(i)=EXP(power*timestep)*oldstate(i)
+      !the effect of the nonlinear term
       end do
       return
       end subroutine nonlinear
@@ -77,14 +95,14 @@ contains
       subroutine fft(fftout, spacial, xlength)
       Implicit none
       Integer,intent(in)::xlength!length of the input/output array
-      Integer::i,k!used to itterate over the array
+      Integer::j,k!used to itterate over the array
       Complex, dimension(xlength),intent(in)::spacial!input array, spacial domain
       Complex, dimension(xlength),intent(out)::fftout!output array, frequency domain
       complex::power!used to make calculations easier
       power=-2*3.1415926*COMPLEX(0.,1.)/xlength
       do k=1,xlength
-      do i=1,xlength
-      fftout(k)=fftout(k)+spacial(i)*EXP(power*(k-1)*(i-1))!FFT of the input array
+      do j=1,xlength
+      fftout(k)=fftout(k)+spacial(j)*EXP(power*(k-1)*(j-1))!FFT of the input array
       end do
       end do
       return

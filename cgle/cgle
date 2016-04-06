@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm FortranCGLE.so
+
 echo -e "\nRecompiling the Fortran Code"
 #{
 f2py -c FortranCGLE.f90 -m FortranCGLE
