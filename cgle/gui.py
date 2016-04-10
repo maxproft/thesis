@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import os,pickle,pylab
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
+import FortranCGLE as cgle
 #from solve import *
 
 import glob as g
@@ -50,6 +51,8 @@ def getgui():
     g.solve['B']=float(g.dic['b1'])+1j*float(g.dic['b2'])
     g.solve['C']=float(g.dic['c1'])+1j*float(g.dic['c2'])
     g.solve['D']=float(g.dic['d1'])+1j*float(g.dic['d2'])
+
+    
     g.solve['tpixels']=float(g.solve['tpixels'])-1
     if not os.path.exists(g.solve['currentfolder']+'/'+g.solve['subfolder']):#making the subfolder, if it doesn't exist
         os.makedirs(g.solve['currentfolder']+'/'+g.solve['subfolder'])
@@ -57,13 +60,29 @@ def getgui():
     if g.solve['trialfunction']=='3':
         g.solve['psi'] = np.loadtxt('import.txt').view(complex)
         if g.solve['psi'].ndim==1:
-            make1D()
+            size = int(float(g.solve['xtotal'])/float(g.solve['xstep']))
+            psi = np.complex64([ TrialFunction((y-size/2.)*float(g.solve['xstep'])-float(g.solve['par3'])) for y in range(size)])
+            array=cgle.alltime(np.float32(g.solve['tstep']),np.float(g.solve['ttotal'])/np.float(g.solve['tstep']),
+                           g.solve['A'],g.solve['B'],g.solve['C'],g.solve['D'],np.float32(g.solve['xtotal']),psi)
+#            make1D()
         elif g.solve['psi'].ndim==2:
             makegif()
     elif g.solve['1d2d']=='0':
         makegif()
     elif g.solve['1d2d']=='1':
-        make1D()
+        size = int(float(g.solve['xtotal'])/float(g.solve['xstep']))
+        psi = np.complex64([ TrialFunction((y-size/2.)*float(g.solve['xstep'])-float(g.solve['par3'])) for y in range(size)])
+        intensity=cgle.alltime(np.float32(g.solve['tstep']),np.float(g.solve['ttotal'])/np.float(g.solve['tstep']),
+                           g.solve['A'],g.solve['B'],g.solve['C'],g.solve['D'],np.float32(g.solve['xtotal']),psi)
+        plot(np.abs(intensity))
+#        make1D()
+
+
+
+
+
+
+
 
 
 #GUI Input Functions

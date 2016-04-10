@@ -4,9 +4,11 @@ rm FortranCGLE.so
 
 echo -e "\nRecompiling the Fortran Code"
 #{
-#f2py -c FortranCGLE.f90 -m FortranCGLE
-f2py -c temp.f90 -m FortranCGLE
+f2py -c FortranCGLE.f90 -m FortranCGLE
+#f2py -c temp.f90 -m FortranCGLE
 #} &> /dev/null
 
-python2.7 test.py
+
+python2.7 gui.py
+#python2.7 test.py
 
