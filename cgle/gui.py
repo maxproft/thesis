@@ -38,7 +38,7 @@ with open("solve.py") as f:
 
 
 
-def getgui():
+def getgui(): #Put the numbers from the gui, into g.solve
     for x in g.dic:
         try:
             g.dic[x] = g.gui[x].get()
@@ -57,13 +57,13 @@ def getgui():
     if not os.path.exists(g.solve['currentfolder']+'/'+g.solve['subfolder']):#making the subfolder, if it doesn't exist
         os.makedirs(g.solve['currentfolder']+'/'+g.solve['subfolder'])
 
-    if g.solve['trialfunction']=='3':
+    if g.solve['trialfunction']=='3':#Importing from 'import.txt', otherwise it calls another function.
         g.solve['psi'] = np.loadtxt('import.txt').view(complex)
+	g.solve['xstep']=float(g.solve['xtotal'])/len(g.solve['psi'])
         if g.solve['psi'].ndim==1:
             size = int(float(g.solve['xtotal'])/float(g.solve['xstep']))
-            psi = np.complex64([ TrialFunction((y-size/2.)*float(g.solve['xstep'])-float(g.solve['par3'])) for y in range(size)])
             array=cgle.alltime(np.float32(g.solve['tstep']),np.float(g.solve['ttotal'])/np.float(g.solve['tstep']),
-                           g.solve['A'],g.solve['B'],g.solve['C'],g.solve['D'],np.float32(g.solve['xtotal']),psi)
+                           g.solve['A'],g.solve['B'],g.solve['C'],g.solve['D'],np.float32(g.solve['xtotal']),np.complex64(g.solve['psi']))
 #            make1D()
         elif g.solve['psi'].ndim==2:
             makegif()
