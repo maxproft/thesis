@@ -1,0 +1,251 @@
+\documentclass[a4paper,12pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{mathtools}
+\usepackage{ifthen}
+
+\oddsidemargin 0.1in		% Left margin is 1in + this value
+\textwidth 5.75in		% Right margin is not set explicitly
+\topmargin 0in			% Top margin is 1in + this value
+\textheight 8.5in			% Bottom margin is not set explicitly
+%\setlength{\columnsep}{2cm}
+
+
+\iffalse
+These words need to be added to the dictionary:
+Ginzburg, soliton, Runge, Kutta, CGLE
+\fi
+
+
+\iffalse
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=4.6in]{correlation}
+\caption{A plot of the correlation in the arrival time of photons for a thermal source. Photons are more likely to be detected shortly after another photon arrives. The axes have arbitrary units as the correlation will vary with the temperature.}
+\label{corr} 
+\end{figure}
+
+\fi
+
+
+
+
+
+
+
+
+\begin{document}
+\begin{titlepage}
+\centering
+{\ \\ }
+\vspace{3cm}
+{\bf  \fontsize{1.35cm}{2.5cm}\selectfont Soliton Solutions of the \vspace{0.5cm} Complex Ginzburg \\\vspace{0.5cm}Landau Equation}\\
+\vspace{2cm}
+{\Huge By Max Proft}\\
+{\Huge u5190335}
+\end{titlepage}
+
+
+
+
+
+
+
+
+
+
+\newcommand{\unnum}[2]{
+\ifthenelse{\equal{#1}{chapter}}{\chapter*{#2}}{
+\ifthenelse{\equal{#1}{section}}{\section*{#2}}{
+\ifthenelse{\equal{#1}{subsection}}{\subsection*{#2}}
+{\chapter*{ERROR: #2}}}}
+\addcontentsline{toc}{#1}{#2} 
+}%This is the exception if no case matches!!!
+\tableofcontents{}
+\iffalse
+The order is:
+Chapter
+Section
+Subsection
+Subsubsection (not shown in contents)
+\fi
+
+
+
+
+
+
+
+
+
+
+
+
+\unnum{chapter}{Abstract}
+Abstract goes here.
+
+\unnum{chapter}{Acknowledgements}
+Chuck in some very cliché acknowledgements here.
+
+
+
+
+
+
+
+
+
+
+
+
+\chapter{Introduction}
+\section{Things to include:}
+dissipative/nonconservative\\
+Where do we see this happening?\cite{Ref2}\\
+nonintegrable, limitations of calculating by hand, the reason for computers\\
+why searching for solutions with machine learning is needed\\
+\cite[pp.~215]{RefExample} 
+
+\section{section}
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit.  
+Etiam lobortis facilisissem.  
+\subsection{subsection}
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit.  
+Etiam lobortis facilisissem.  
+\subsection{subsection 2}
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit.  
+Etiam lobortis facilisissem.  
+
+\section{Second Section}
+ 
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit.  
+Etiam lobortis facilisissem.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+\chapter{Derivations of the CGLE}
+\section{For a Quantum System}
+\section{For a Classical System}
+
+
+
+
+
+
+
+
+
+
+
+
+\chapter{Types of solitons}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\chapter{Mathematical Theory Behind Solving the CGLE}
+Decide whether to use non linear, non-linear, nonlinear
+\section{A Comparison of Different Methods}
+\section{Split Step Fourier and Runge-Kutta Method}
+\subsection{Linear evolution (Fourier)}
+\subsection{Nonlinear evolution (Runge-Kutta)}
+\subsection{The relationship between a Fourier Transform and a Discrete Fourier Transform}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\chapter{Machine Learning Theory}
+I want to enter in an image, and get it to tell me if it is oscillating/etc.\\
+I want another machine learning algorithm to predict the required precision, and wait time before recording the output.\\
+Monte Carlo and gradient descent to find new solns.\\
+\section{Different Options for the Machine Learning Algorithm}
+\section{A detailed look at neural networks}
+\section{Training and Testing the Algorithm}
+
+
+
+
+
+
+
+
+
+
+
+\chapter{The result from much work}
+\section{The sorts of things that I found}
+
+
+
+
+
+
+
+
+
+
+
+
+\unnum{chapter}{Conclusion}
+\unnum{chapter}{Appendix A}
+\unnum{chapter}{Appendix B}
+
+\begin{thebibliography}{9}
+%Introduction
+\bibitem{RefExample}
+    Name \emph{Title},
+    Publishing info, etc
+\bibitem{Ref2}
+    Another Guy \emph{title2}
+    pub,etc.
+%Derivation of CGLE
+
+%Types of Solitons
+
+%Mathematical theory behind solving CGLE
+
+%Machine Learning
+
+%My solitons
+
+
+\end{thebibliography}
+
+
+\end{document}

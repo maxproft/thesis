@@ -59,7 +59,7 @@ def getgui(): #Put the numbers from the gui, into g.solve
 
     if g.solve['trialfunction']=='3':#Importing from 'import.txt', otherwise it calls another function.
         g.solve['psi'] = np.loadtxt('import.txt').view(complex)
-	g.solve['xstep']=float(g.solve['xtotal'])/len(g.solve['psi'])
+        g.solve['xstep']=float(g.solve['xtotal'])/len(g.solve['psi'])
         if g.solve['psi'].ndim==1:
             size = int(float(g.solve['xtotal'])/float(g.solve['xstep']))
             array=cgle.alltime(np.float32(g.solve['tstep']),np.float(g.solve['ttotal'])/np.float(g.solve['tstep']),
