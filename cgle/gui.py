@@ -8,7 +8,9 @@ import matplotlib.pyplot as plt
 import os,pickle,pylab
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-import FortranCGLE as cgle
+#import FortranCGLE as cgle
+import pythonCGLE as cgle
+
 #from solve import *
 
 import glob as g

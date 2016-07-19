@@ -72,7 +72,7 @@
       
       
       do i=1,xlength
-      nonlinout(i) = oldstate(i)+(k1(i)+2*k2(i)+2*k3(i)+k4(i))*timestep/6.
+      nonlinout(i) = oldstate(i)+(k1(i)+k2(i)+k3(i)+k4(i))*timestep/6.
       end do
       return
       end subroutine nonlinear
