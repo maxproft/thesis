@@ -1,4 +1,6 @@
 #!/usr/bin/python
+#recommended time step size  is 1e-4
+#recommended spacial step size is 1/100 of the total range
 try:
     from Tkinter import *
 except:

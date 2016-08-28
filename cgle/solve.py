@@ -41,9 +41,21 @@ def maxmin(x):
 vmaxmin=np.vectorize(maxmin)
 
 def plot(intensity, title="", name='a'):
+    if 0:
+        plt.close()
+        plt.cla()
+        plt.clf()
+        plt.plot(intensity[0])
+        plt.plot(intensity[1])
+        plt.plot(intensity[-1])
+        plt.show()
+    
     plt.close()
     plt.cla()
     plt.clf()
+    rows,cols = np.shape(intensity)
+    if cols<rows:
+        intensity = intensity[-cols:]
     #fig = matplotlib.figure.Figure
     fig = plt.figure()
     ax = fig.add_subplot(111, aspect='equal')

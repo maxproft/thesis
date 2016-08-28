@@ -7,6 +7,7 @@
 \usepackage{array}
 \usepackage{mathtools}
 \usepackage{ifthen}
+\usepackage{mathrsfs}
 
 \oddsidemargin 0.1in		% Left margin is 1in + this value
 \textwidth 5.75in		% Right margin is not set explicitly
@@ -17,19 +18,27 @@
 
 \iffalse
 These words need to be added to the dictionary:
-Ginzburg, soliton, Runge, Kutta, CGLE
+Ginzburg, soliton, Runge, Kutta, CGLE, Fourier, Landau
 \fi
 
 
 \iffalse
-
 \begin{figure}[h]
 \centering
 \includegraphics[width=4.6in]{correlation}
 \caption{A plot of the correlation in the arrival time of photons for a thermal source. Photons are more likely to be detected shortly after another photon arrives. The axes have arbitrary units as the correlation will vary with the temperature.}
 \label{corr} 
 \end{figure}
+\fi
 
+
+\iffalse
+Before I submit, make sure I check that the following have updated themselves properly.
+Spell Check
+Contents Page
+Image reference numbers
+Table reference numbers
+Citation numbers
 \fi
 
 
@@ -154,8 +163,10 @@ Etiam lobortis facilisissem.
 
 
 \chapter{Types of solitons}
+\subsection{Analytic Solutions}
 
-
+\subsection{Other Solutions}
+Chaotic, but spatially localised.
 
 
 
@@ -168,13 +179,92 @@ Etiam lobortis facilisissem.
 
 
 \chapter{Mathematical Theory Behind Solving the CGLE}
-Decide whether to use non linear, non-linear, nonlinear
 \section{A Comparison of Different Methods}
+Decide whether to use non linear, non-linear, nonlinear
+Finite difference, what was used initially to get it all going, is bad because you do $\delta \psi / \delta x$, so over a small time period, the $\delta \psi$ term can lose several digits of precision, not good. There are a number of other ways for this to be solved though. 
+\\\\
+
+For the nonlinear schrodinger equation, (author) compared various methods for solving this. 
+Other methods are EXAMPLE, and a split step fourier method. The first is better for large, slowly changing features, the second is better for sharp peaks, and the third is better for both of these.
+Given the similarity between the CGLE and NLSE, this means that this should also be a reasonably good method to do this part as well. 
+
 \section{Split Step Fourier and Runge-Kutta Method}
 \subsection{Linear evolution (Fourier)}
-\subsection{Nonlinear evolution (Runge-Kutta)}
-\subsection{The relationship between a Fourier Transform and a Discrete Fourier Transform}
+Here we are solving the equation: 
+$$\frac{d\psi}{dt}=A\frac{d^2\psi}{dx^2}+B\psi$$
+Defining the fourier transform by: 
+$$\hat \psi(f)=\int\limits_{-\infty}^\infty \psi(x)e^{-i2\pi x f} dx$$
+By taking the fourier transform of both sides, the equation becomes:\\
+$$\frac{d \hat \psi}{dt}= C(-2\pi i f)^2 D\hat \psi (f)+\hat \psi(f)= (C-D4 \pi^2 f^2) \hat \psi(f)$$
+$$\implies \hat \psi_t(f) = e^{(C-D4\pi^2 f^2)t}\hat \psi_0(f)$$
+And so upon inverse fourier transforming, we get the solution to this DE, where $\hat \psi_t(f)$ is the fourier transform at time $t$.
+The Fourier transform can be done numerically with a discrete fourier transform, as described in a later subsection.
 
+\subsection{Nonlinear evolution (Runge-Kutta)}
+Here we are solving the equation:
+$$\frac{d\psi}{dt}=C|\psi|^2\psi + D|\psi|^4\psi$$
+The runga kutta method allows you to numerically solve a 1st order differential equation. which are of the form $\frac{dy}{dt}=f(t,y)$. Similar to Euler's method (which is basically just doing a derivative from first principles), except that the runge kutta method has better convergence than this. (it goes as $h^5$ as opposed to Euler's Method which is $h^2$, the backward euler formula, $h^2$, or improved euler formula which goes as $h^3$. Here $h$ is the step size. 
+\\\\
+The steps for doing this are as follows:
+Step 1: define $f(t,y)=f(y)=C|y|^2 y  +D|y|^4 y$
+Step 2: Have an initial value for $t$ and $y$, and step size and number of steps
+Step 3: define the following:
+$$K1 =f(t,y)=f(y)$$
+$$K2 =f(t+0.5h,y+0.5*h*K1)=f(y+h*K1/2)$$
+$$K3 =f(t+0.5h,y+0.5*h*K2)=f(y+h*K2/2)$$
+$$K4 =f(t+h,y+h*K3)=f(y+h*K3)$$
+Step 4: we then progress forwards $t$ and $y$ in the following way:
+$$t\rightarrow t+h$$
+$$y\rightarrow y+(K1+2K2+2K3+K4)*h/6$$
+
+
+\subsection{The relationship between a Fourier Transform and a Discrete Fourier Transform}
+\subsection{The relationship between a Fourier Transform and a Discrete Fourier Transform}
+I am pretty sure this entire section needs to be rewritten.\\
+We can approximate any function with a Fourier series. (by applying periodic boundary conditions)\\
+$$f(t)=\sum\limits_{-\infty}^{\infty} c_n e^{i n t}$$
+Multiplying both sides by $e^{-i m t}$ and integrating from 0 to $2\pi$, and dividing by $2\pi$:
+$$\frac{1}{2\pi} \int\limits_{0}^{2\pi} f(t)e^{-i m t}dt = \frac{1}{2\pi} \sum \limits_{n=-\infty}^{\infty} c_n \int\limits_{0}^{2\pi} d^{i (n-m) t} dt= c_m$$
+$$\frac{1}{2\pi} \int\limits_{0}^{2\pi} f(t)e^{-i m t}dt =c_m$$
+We use the substitution:
+$$t = \frac{2\pi}{L}  x \implies x = \frac{L}{2\pi} t$$
+$$dt = \frac{2\pi}{L}  dx$$
+And then this becomes:
+$$c_m = \frac{1}{L} \int\limits_{0}^{L} f(x) e^{-i m 2\pi x/L} dx $$
+
+For a fourier series $\{c_n\}$, the fourier transform is given given by:
+
+$$\hat f (freq) = \sum\limits_{-\infty}^{\infty} c_n \mathscr{\hat F}(e^{i n 2 \pi x/L})(freq)$$ 
+
+But we have $$\mathscr{\hat F}(e^{i n 2 \pi x/L}) = \int\limits_{-\infty}^\infty e^{i n 2 \pi x/L}e^{-i 2\pi freq x} dx $$
+$$= \int\limits_{-\infty}^\infty e^{i x (n 2 \pi /L - 2\pi freq )}dx = 2\pi \delta (n 2\pi/L -2\pi freq)= \delta (n /L - freq)$$
+
+And so we get:
+$$\hat f (freq) = \sum\limits_{-\infty}^{\infty} c_n \delta(freq.- n/L)$$
+$$= \sum\limits_{-\infty}^{\infty} c_n /L \delta(freq. L- n)$$
+
+If we inverse fourier transform we get the following.
+We can also use $x/L=n/N$
+$$Data = spacial,  Fata=frequency$$
+
+
+I don’t think the following is useful:
+$$f(x)= \sum\limits_{n=-\infty}^\infty f_n e^{2\pi i n x/L} $$
+If we multiply both sides by $e^{-2\pi i m x/L}$ and integrate we get:
+$$\int \limits_{-\infty}^\infty f(x)e^{2\pi i n x/L} dx = \sum\limits_{n=-\infty}^\infty  f_n  \int \limits_{-\infty}^\infty  e^{i 2 \pi x/L (n-m)} dx  =  \sum\limits_{n=-\infty}^\infty  f_n  \int \limits_{-\infty}^\infty  e^{i 2 \pi x (n-m)/L} dx  $$
+$$=  \sum\limits_{n=-\infty}^\infty  f_n \delta((n-m)/L) = f_n \delta((n-m)/L)$$
+
+
+
+
+
+\section{Testing the Code}
+\subsection{Comparison with Analytic Solutions}
+Find exact solutions (to both CGLE and NLSE), and show that it matches well.
+After $x$ amount of time, how accurate is the answer
+\subsection{Decreasing the step size and Determining Appropriate Values}
+Find interesting solitons and show that we can reproduce these solutions.\\\\
+For unusual, and non-analytic solutions, especially spiny solitons, as you decrease the step size, after a length of time $t$, how close is the answer to the limit? I.e. make the time step size 0.1, and propagate forwards in time until t=10. repeat with step sizes 0.01, 0.001 and plot the final answer. It should approach a constant value. Take the step size to be the smallest value such that the solution is within 1\% of the answer with the previous step size.
 
 
 
