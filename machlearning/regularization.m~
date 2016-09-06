@@ -14,7 +14,4 @@ SDArray = ones(n,1)*SD;
 regData = (Data-averageArray)./SDArray;
 
 
-
-
-
 end

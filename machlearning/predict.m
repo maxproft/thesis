@@ -3,18 +3,21 @@ function pred = predict(inData,theta,regMean,regSD)
 
 
 %generate the polynomial features
-polyData = regdata
+
+
+polyData = polyFeatures(inData);
 
 
 
 [n,m] = size(polyData);
-meanArray = ones(n,1)*average;
-SDArray = ones(n,1)*SD;
+meanArray = ones(n,1)*regMean;
+SDArray = ones(n,1)*regSD;
 
 
-regData = (polyData-averageArray)./SDArray;
+regPoly = (polyData-meanArray)./SDArray;
+regPoly(1:end,1)=1; %this forces the first column, the fixed values, to be one after regularisation
 
-pred = regData*theta';
+pred = regPoly*theta';
 
 end
 

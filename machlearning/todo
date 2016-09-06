@@ -3,15 +3,8 @@ Generate the raw data
 
 
 
-
-add in lines to compute theta
-debug my code
-Test against linear data and make sure that prediction works.
-
-
-
-generate polynomial terms from input data
-make sure that I can compute the same polynomial terms in PredictPlot
+generate polynomial terms from input data in both linreg and prediction
+make sure that I compute the same polynomial terms in PredictPlot
 
 
 
