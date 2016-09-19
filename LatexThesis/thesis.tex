@@ -16,9 +16,12 @@
 %\setlength{\columnsep}{2cm}
 
 
+
 \iffalse
 These words need to be added to the dictionary:
 Ginzburg, soliton, Runge, Kutta, CGLE, Fourier, Landau
+discretise
+Decide whether to use non linear, non-linear, nonlinear
 \fi
 
 
@@ -26,7 +29,7 @@ Ginzburg, soliton, Runge, Kutta, CGLE, Fourier, Landau
 \begin{figure}[h]
 \centering
 \includegraphics[width=4.6in]{correlation}
-\caption{A plot of the correlation in the arrival time of photons for a thermal source. Photons are more likely to be detected shortly after another photon arrives. The axes have arbitrary units as the correlation will vary with the temperature.}
+\caption{A ploperature.}
 \label{corr} 
 \end{figure}
 \fi
@@ -91,8 +94,10 @@ Subsubsection (not shown in contents)
 
 
 
-
-
+\unnum{chapter}{Sections I can already write}
+3.0.1, 3.0.2 - Types of solitons, both analytic and others - I will need to do the pictures later though.\\\\
+4.2.3 - Relationship between DFT and FT\\\\
+5.1 - Different types of machine learning\\\\
 
 
 \unnum{chapter}{Abstract}
@@ -180,12 +185,13 @@ Chaotic, but spatially localised.
 
 \chapter{Mathematical Theory Behind Solving the CGLE}
 \section{A Comparison of Different Methods}
-Decide whether to use non linear, non-linear, nonlinear
+
 Finite difference, what was used initially to get it all going, is bad because you do $\delta \psi / \delta x$, so over a small time period, the $\delta \psi$ term can lose several digits of precision, not good. There are a number of other ways for this to be solved though. 
 \\\\
-
-For the nonlinear schrodinger equation, (author) compared various methods for solving this. 
-Other methods are EXAMPLE, and a split step fourier method. The first is better for large, slowly changing features, the second is better for sharp peaks, and the third is better for both of these.
+There are analytic methods when certain parameters are forced to be 0 for example ...
+\\\\ 
+\\\\
+For the nonlinear schrodinger equation, (author) compared various methods for solving this. Other methods are EXAMPLE, and a split step fourier method. The first is better for large, slowly changing features, the second is better for sharp peaks, and the third is a good middle man, being better at both of these. 
 Given the similarity between the CGLE and NLSE, this means that this should also be a reasonably good method to do this part as well. 
 
 \section{Split Step Fourier and Runge-Kutta Method}
@@ -209,16 +215,17 @@ The steps for doing this are as follows:
 Step 1: define $f(t,y)=f(y)=C|y|^2 y  +D|y|^4 y$
 Step 2: Have an initial value for $t$ and $y$, and step size and number of steps
 Step 3: define the following:
-$$K1 =f(t,y)=f(y)$$
-$$K2 =f(t+0.5h,y+0.5*h*K1)=f(y+h*K1/2)$$
-$$K3 =f(t+0.5h,y+0.5*h*K2)=f(y+h*K2/2)$$
-$$K4 =f(t+h,y+h*K3)=f(y+h*K3)$$
+$$K_1 =f(t,y)=f(y)$$
+$$K_2 =f(t+0.5h,y+0.5*h*K_1)=f(y+h*K_1/2)$$
+$$K_3 =f(t+0.5h,y+0.5*h*K_2)=f(y+h*K_2/2)$$
+$$K_4 =f(t+h,y+h*K_3)=f(y+h*K_3)$$
 Step 4: we then progress forwards $t$ and $y$ in the following way:
 $$t\rightarrow t+h$$
-$$y\rightarrow y+(K1+2K2+2K3+K4)*h/6$$
+$$y\rightarrow y+(K_1+2K_2+2K_3+K_4)*h/6$$
+
+\iffalse
 
 
-\subsection{The relationship between a Fourier Transform and a Discrete Fourier Transform}
 \subsection{The relationship between a Fourier Transform and a Discrete Fourier Transform}
 I am pretty sure this entire section needs to be rewritten.\\
 We can approximate any function with a Fourier series. (by applying periodic boundary conditions)\\
@@ -254,6 +261,42 @@ If we multiply both sides by $e^{-2\pi i m x/L}$ and integrate we get:
 $$\int \limits_{-\infty}^\infty f(x)e^{2\pi i n x/L} dx = \sum\limits_{n=-\infty}^\infty  f_n  \int \limits_{-\infty}^\infty  e^{i 2 \pi x/L (n-m)} dx  =  \sum\limits_{n=-\infty}^\infty  f_n  \int \limits_{-\infty}^\infty  e^{i 2 \pi x (n-m)/L} dx  $$
 $$=  \sum\limits_{n=-\infty}^\infty  f_n \delta((n-m)/L) = f_n \delta((n-m)/L)$$
 
+\fi
+
+
+
+
+\subsection{The relationship between a Fourier Transform and a Discrete Fourier Transform:}
+Below works for periodic boundary conditions, or if you assume that the function goes to zero at the boundary. For ease of proving the relationship, we assume the latter. 
+\\\\
+Defining the Fourier transform as:
+$$\tilde \psi(f) = \int_{-\infty}^\infty \psi(x) e^{-i2\pi xf} dx \approx \int_0^L\psi(x)e^{-i2\pi x f}dx$$
+Let $\Delta x=L/N$ for some integer $N$.
+$$\approx \sum\limits_{n=0}^{N-1}\psi(n \Delta x) e^{-i 2\pi n \Delta x f}\Delta x$$
+With the same arguments, we get the inverse Fourier transform to be:\\ 
+($\Delta f = (f_1-f_0)/N$, for some values of $f_1$ and $f_2$)
+$$\psi(x) = \int_{-\infty}^\infty \tilde\psi(f)e^{i 2\pi x f} df \approx \int_{f_0}^{f_1}\tilde\psi(f)e^{i 2\pi x f}df \approx \sum\limits_{m=0}^{N-1}\tilde\psi(f_0+m\Delta f)e^{i 2\pi n\Delta x f_0} e^{i 2\pi x m\Delta f}\Delta f$$
+Let $\psi(n\Delta x) = \psi_n$ and $\tilde\psi(f_0+m\Delta f) = \tilde \psi_m$ and let $f_0=-\pi/\Delta x$ 
+$$\tilde \psi_m\approx \Delta x \sum\limits_{n=0}^{N-1}\psi_n e^{-i 2\pi n \Delta x f_0}e^{-i 2\pi n m \Delta x \Delta f}$$
+$$\psi_n  \approx \Delta f e^{i 2\pi n\Delta x f_0}\sum\limits_{m=0}^{N-1}\tilde\psi_m e^{i 2\pi n m \Delta x \Delta f}$$
+Since the definition of the discrete Fourier transform is
+$$\tilde A_m =  \sum\limits_{n=0}^{N-1} A_n e^{-i 2\pi n m/N}$$
+$$A_n  = \frac{1}{N}\sum\limits_{m=0}^{N-1}\tilde A_m e^{i 2\pi n m/N}$$
+We now have a way to compute (inverse) Fourier transforms given a set of data that is a sufficiently good approximation of the initial function.
+\\\\
+We want $f_1-f_0=1/\Delta x$ so that the frequency difference corresponds to the difference between adjacent elements. This means we get $\Delta f = 1/(N\Delta x)$. We then choose to take $f_0=\frac{-1}{2\Delta x}$ is chosen so it satisfies the Nyquist limit.
+$$\tilde \psi_m\approx \Delta x \sum\limits_{n=0}^{N-1}\psi_n e^{i \pi n }e^{-i 2\pi n m/N}$$
+$$\psi_n  \approx \frac{e^{-i \pi n}}{N\Delta x}\sum\limits_{m=0}^{N-1}\tilde\psi_m e^{i 2\pi n m/N}$$
+
+
+Check I have done this the same way in my program. and that I have used $e^{i\pi n}=\pm 1$
+
+
+\subsection{Combining these operations}
+With the split step fourier method, we assume that the linear and nonlinear terms do not affect each other over short timescales. This means that we can propegate forwards according to the linear evolution equation, and then propegate forwards according to the nonlinear evolution equation, and we should get a good approximation for the solution to the original differential equation. This can be represented as the following, where $\hat N$ refers to the nonlinear evolution operator, and $\hat L$ refers to the linear evolution operator.
+$$\psi(t)=e^{\hat N(t)}e^{\hat L(t)}\psi(0)$$ 
+It turns out, however, that a more stable way of doing this evolution is with the following (notice that the two outside terms are both evolution operators for half of the time period):
+$$\psi(t)=e^{\hat N(t/2)}e^{\hat L(t)}e^{\hat N(t/2)}\psi(0)$$ 
 
 
 
@@ -281,13 +324,47 @@ For unusual, and non-analytic solutions, especially spiny solitons, as you decre
 
 
 \chapter{Machine Learning Theory}
+\section{Different Types of Machine Learning}
 I want to enter in an image, and get it to tell me if it is oscillating/etc.\\
 I want another machine learning algorithm to predict the required precision, and wait time before recording the output.\\
 Monte Carlo and gradient descent to find new solns.\\
-\section{Different Options for the Machine Learning Algorithm}
-\section{A detailed look at neural networks}
+\section{Linear Regression}
+Former Title: Different Options for the Machine Learning Algorithm\\
+Another Title Removed: A detailed look at neural networks\\
+\\
+Step 1: Define a cost function:\\
+Suppose we have input parameters $\vec x_i$ with the true value given by $y_i$. For linear regression, we choose $\vec\theta$ such that our prediction for the value of $y_i$ is $\vec\theta \cdot \vec x_i$. We want to vary the vector $\vec \theta$ such that the predictions match as best as possible. This is typically done by providing a cost function that is lowest when the predictions match the true value best. A typical cost function is (least squares):
+$$J_\theta = \sum_i \left(\vec\theta\cdot \vec x_i -y_i\right)^2 $$
+\\
+Suppose we have two parameters, we might get an image as shown below. 
+\begin{figure}[h]
+\centering
+\includegraphics[width=3in]{GradDescent}
+\caption{Gradient descent example}
+\label{corr} 
+\end{figure}
+The minimum of this graph give $\theta$ which causes the best predictions. 
+Typically the algorithm to find the minimum is done by continually taking the steepest path. However the algorithm may end up finding a local minima, as in the subsequent figure. 
+\begin{figure}[h]
+\centering
+\includegraphics[width=2in]{localmin}
+\caption{Gradient descent example}
+\label{corr} 
+\end{figure}
+Octave has lots of fancy functions that can do this really efficiently, and can try to avoid local minima.
+\\\\
+We can increase the number of input features. One feature we want to add is an intercept term, which will equal $1$ for every training example. Other features we might want to add, for example, would be the polynomial features $\{x_1^2,x_1x_2,x_1x_3, ... \}$. However if we add in these extra features, we are faced with another issue, and that is overfitting. If we have a high degree polynomial, it becomes much easier to overfit the data. In order to prevent this, we can adjust the cost function to:
+$$J_\theta = \frac{1}{2m}\sum_i \left(\vec\theta\cdot \vec x_i -y_i\right)^2 +\frac{\lambda}{2m} |\vec\theta|^2$$
+By doing this, if several of the elements of $\vec \theta$ are large, then the cost will increase, and so only the important features will remain large. However for this to work we must normalise the data, and in my program this is done by transforming each feature $x_i^{(j)}$  in the following manner, where the $i$ indicates that it is the $i^{th}$ training example, and the $j$ index refers to the $j^{th}$ component of the vector. Below $\mu^{(j)}$ refers to the mean of the $j^{th}$ component of all the training examples, and $\sigma^{(j)}$ the standard deviation
+$$x_i^{(j)}\rightarrow \frac{x_i^{(j)}-\mu^{(j)}}{\sigma^{(j)}}$$
+This ensures that all of the features are on the same scale, and so the elements of $\theta$ are penalised equally by the cost function. 
+
+
+
 \section{Training and Testing the Algorithm}
 
+Tried initially with only linear terms, then expanded to polynomial terms with regularisation and it was able to fit data with polynomial features $(0.5x_1+x_2^3)$. This game me the confidence that the algorithm was working correctly, and so I could go ahead and train the algorithm on real data with confidence.\\\\
+My algorithm went up to 4th order polynomial terms, and with 6 different parameters being varied, this results in a total of 210 features. 
 
 
 

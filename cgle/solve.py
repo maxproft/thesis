@@ -50,6 +50,8 @@ def plot(intensity, title="", name='a'):
         plt.plot(intensity[-1])
         plt.show()
     
+    np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".csv", intensity, delimiter=",")
+
     plt.close()
     plt.cla()
     plt.clf()

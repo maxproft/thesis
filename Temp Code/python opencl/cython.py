@@ -12,17 +12,17 @@ def myfunction(i,mylist=mylist):
         a=(a+a+3*a+1.24535743215*a)**1.735564
         a=1.5131435442*a*(3.16542354*a+1.453143*a)
     if i==5: #This is to test whether or not it will start another process or wait for it to finish.
-        print 'start'
+        print( 'start')
         [longtime() for x in range(10)]
-        print 'stop'
+        print( 'stop')
     else:
         longtime()
-    print mylist[i]
+    print( mylist[i])
     return i
 
 def looping(i):
     pool =multiprocessing.Pool() #creates a pool of process, controls worksers
-    result = pool.map(myfunction,xrange(i))
+    result = pool.map(myfunction,range(i))
     pool.close() #we are not adding any more processes
     pool.join() #tell it to wait until all threads are done before going on
     sys.stdout.flush()
@@ -31,6 +31,6 @@ def looping(i):
 
 
 output = looping(length)
-print output
+print( output)
 
 
