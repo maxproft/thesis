@@ -4,8 +4,7 @@ import matplotlib
 import os
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-
-
+from PIL import Image
 
 
 def TrialFunction(dist):
@@ -41,17 +40,23 @@ def maxmin(x):
 vmaxmin=np.vectorize(maxmin)
 
 def plot(intensity, title="", name='a'):
-    if 0:
+  if 1:#This saves the data
+      np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".csv", intensity, delimiter=",")
+  if 0:#This plots the initial intensity profile, the next intensity profile, and the final intensity profile
         plt.close()
         plt.cla()
         plt.clf()
-        plt.plot(intensity[0])
-        plt.plot(intensity[1])
-        plt.plot(intensity[-1])
+        xlist = range(len(intensity[0]))
+        plt.plot(xlist,intensity[0],'b-')
+        #plt.plot(xlist,intensity[-1],'r-')
         plt.show()
+<<<<<<< HEAD
+  if 0:#This plots the data using matplotlib
+=======
     
     np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".csv", intensity, delimiter=",")
 
+>>>>>>> origin/master
     plt.close()
     plt.cla()
     plt.clf()
@@ -68,6 +73,12 @@ def plot(intensity, title="", name='a'):
     plt.savefig(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".png")
 #    plt.show()
     #plt.close()
+  if 1:#This plots the data as a 128bit greyscale image
+    def normalisedata(I):
+        I = np.array(I)
+        return (((I.max()-I) / (I.max() - I.min())) * 255.9).astype(np.uint8)
+    img = Image.fromarray(np.flipud(normalisedata(intensity)))
+    img.save(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".png")
 
 
 def make1D():

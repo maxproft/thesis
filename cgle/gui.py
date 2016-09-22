@@ -1,6 +1,5 @@
 #!/usr/bin/python
-#recommended time step size  is 1e-4
-#recommended spacial step size is 1/100 of the total range
+
 try:
     from Tkinter import *
 except:
@@ -78,6 +77,7 @@ def getgui(): #Put the numbers from the gui, into g.solve
         psi = np.complex64([ TrialFunction((y-size/2.)*float(g.solve['xstep'])-float(g.solve['par3'])) for y in range(size)])
         intensity=cgle.alltime(np.float32(g.solve['tstep']),np.float(g.solve['ttotal'])/np.float(g.solve['tstep']),
                            g.solve['A'],g.solve['B'],g.solve['C'],g.solve['D'],np.float32(g.solve['xtotal']),psi)
+        print("Finished making data")
         plot(np.abs(intensity))
 #        make1D()
 
