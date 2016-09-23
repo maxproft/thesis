@@ -50,13 +50,11 @@ def plot(intensity, title="", name='a'):
         plt.plot(xlist,intensity[0],'b-')
         #plt.plot(xlist,intensity[-1],'r-')
         plt.show()
-<<<<<<< HEAD
+
   if 0:#This plots the data using matplotlib
-=======
     
     np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".csv", intensity, delimiter=",")
 
->>>>>>> origin/master
     plt.close()
     plt.cla()
     plt.clf()

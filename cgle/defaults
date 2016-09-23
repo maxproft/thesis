@@ -1,201 +1,132 @@
 (dp0
 S'b2'
 p1
-S'-0.1'
+S'0.5'
 p2
 sS'One Error'
 p3
 I1
 sS'par7'
 p4
-S'1000'
+S'1'
 p5
 sS'par6'
 p6
-S'2'
+S'3'
 p7
 sS'par5'
 p8
-S'0'
+S'10'
 p9
 sS'par4'
 p10
-S'3'
+S'0'
 p11
-<<<<<<< HEAD
 sS'par3'
-=======
-S'0.1'
->>>>>>> origin/master
 p12
-g9
+g11
 sS'par2'
 p13
-<<<<<<< HEAD
-g11
-=======
-S'0.5'
-p14
->>>>>>> origin/master
+g5
 sS'par1'
 p14
-g11
-sS'd2'
+S'2'
 p15
-S'0.1'
+sS'd2'
 p16
-<<<<<<< HEAD
-=======
-S'0.1'
+S'-0.07'
 p17
->>>>>>> origin/master
 sS'd1'
-p17
-g9
-sS'currentfolder'
 p18
-<<<<<<< HEAD
-S'/home/max/thesis/cgle'
-=======
-S'-0.001'
->>>>>>> origin/master
+S'-0.1'
 p19
-sS'xpixels'
+sS'currentfolder'
 p20
-S'100'
+S'/home/max/thesis/cgle'
 p21
-sS'1d2d'
+sS'xpixels'
 p22
-S'1'
+S'100'
 p23
-sS'ttotal'
+sS'1d2d'
 p24
-S'10'
+g5
+sS'ttotal'
 p25
-<<<<<<< HEAD
-=======
-S'10'
+S'60'
 p26
->>>>>>> origin/master
 sS'A'
-p26
+p27
 c__builtin__
 complex
-p27
+p28
 (F-0.1
 F0.0
-tp28
-Rp29
+tp29
+Rp30
 sS'C'
-<<<<<<< HEAD
-p30
-g27
-(F0.1
-=======
 p31
 g28
-(F0.095
->>>>>>> origin/master
+(F0.785
 F1.0
-tp31
-Rp32
+tp32
+Rp33
 sS'B'
-<<<<<<< HEAD
-p33
-g27
-(F0.0125
-F-0.1
-tp34
-Rp35
-sS'D'
-p36
-g27
-(F0.0
-F0.1
-tp37
-Rp38
-=======
 p34
 g28
-(F0.125
+(F0.08
 F0.5
 tp35
 Rp36
 sS'D'
 p37
 g28
-(F-0.001
-F0.1
+(F-0.1
+F-0.07
 tp38
 Rp39
->>>>>>> origin/master
 sS'a1'
-p39
-S'-0.1'
 p40
-sS'absreal'
+S'-0.1'
 p41
-g9
-sS'tpixels'
+sS'absreal'
 p42
-S'100'
+g11
+sS'tpixels'
 p43
-sS'c2'
+S'100'
 p44
-g23
-sS'c1'
+sS'c2'
 p45
-S'0.1'
+g5
+sS'c1'
 p46
-<<<<<<< HEAD
-=======
-S'0.095'
+S'0.785'
 p47
->>>>>>> origin/master
 sS'tstep'
-p47
-S'0.005'
 p48
-sS'xtotal'
+S'0.003'
 p49
-S'10'
+sS'xtotal'
 p50
-<<<<<<< HEAD
-=======
-S'10'
+S'15'
 p51
->>>>>>> origin/master
 sS'subfolder'
-p51
-S'subfolder9'
 p52
-<<<<<<< HEAD
-=======
 S'subfolder3'
 p53
->>>>>>> origin/master
 sS'xstep'
-p53
-S'0.005'
 p54
-<<<<<<< HEAD
-=======
-S'0.001'
+S'0.01'
 p55
->>>>>>> origin/master
 sS'trialfunction'
-p55
-g7
-sS'a2'
 p56
-g9
-sS'b1'
+g15
+sS'a2'
 p57
-S'0.0125'
+g11
+sS'b1'
 p58
-<<<<<<< HEAD
-=======
-S'0.125'
+S'0.08'
 p59
->>>>>>> origin/master
 s.

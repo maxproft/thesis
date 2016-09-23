@@ -1,132 +1,100 @@
 import numpy as np
 import pyfftw
 
-def nonlinde(C,D,oldstate):
-        absolute = oldstate * oldstate.conjugate()
-        return C*oldstate*absolute + D*oldstate*absolute**2
-        #return np.array([C*x*abs(x)**2+D*x*abs(x)**4 for x in oldstate])
-
-def nonlinear(timestep,C,D,oldstate):
-<<<<<<< HEAD
-    #oldstate=np.array(oldstate)
-   # return oldstate
-=======
-    oldstate=np.array(oldstate)
->>>>>>> origin/master
-    k1=nonlinde(C,D,oldstate)
-    k2=nonlinde(C,D,oldstate+k1*timestep/2.)
-    k3=nonlinde(C,D,oldstate+k2*timestep/2.)
-    k4=nonlinde(C,D,oldstate+k3*timestep)
-
-    return oldstate+(k1+2*k2+2*k3+k4)*timestep/6.
-
-<<<<<<< HEAD
-
-
-def linear(timestep,A,B,RealLength,LinList,pm,oldstate):
-    #LinList = [np.exp((A-B*(3.14159265*(2*m-len(oldstate))/RealLength)**2)*timestep) for m in range(len(oldstate))]
-    #fourier = np.fft.fft([old*(-1)**m for m,old in enumerate(oldstate)])
-    #temp = [L*F for L,F in zip(LinList,fourier)]
-    #invfft = np.fft.ifft(temp)
-    #return [inv*(-1)**m for m,inv in enumerate(invfft)]
-
-    #pm = np.array([(-1)**m for m in range(len(oldstate))])
-
-    return np.fft.ifft(np.fft.fft(oldstate*pm)*LinList)*pm
-
-=======
-def linear(timestep,A,B,RealLength,oldstate):
-    
-    fourier = np.fft.fft([item * np.exp(1j*3.14159265*n) for n,item in enumerate(oldstate)])
-    temp = [np.exp((A-B*(3.14159265*(2*m-len(oldstate))/RealLength)**2)*timestep)*item for m,item in enumerate(fourier)]
-    invfft = np.fft.ifft(temp)
-    return [item*np.exp(-1j*3.14159265*n) for n,item in enumerate(invfft)]
->>>>>>> origin/master
-
-def oldlinear(timestep,A,B,RealLength,oldstate):
-    print("WHY AM I IN OLDLINEAR?")
-    power = -B*timestep*4.*3.14159265359**2/RealLength**2
-    fourier = np.fft.fft(oldstate)
-    temp = [np.exp(power*k**2+A*timestep)*item for k,item in enumerate(fourier)]
-    return np.fft.ifft(temp)
-
-def OLDFUNCTIONonestep(timestep,A,B,C,D,RealLength,oldstate):
-        print("WHY AM I IN THE OLD FUNCTION??")
-        power = -B*timestep*4.*3.14159265359**2/RealLength**2
-        nonlin = nonlinear(timestep,C,D,oldstate)
-        fourier = np.fft.fft(nonlin)
-        temp = [np.exp(power*k**2+A*timestep)*item for k,item in enumerate(fourier)]
-        return np.fft.ifft(temp)
-
-def onestep(timestep,A,B,C,D,RealLength,LinList,pm,oldstate):
-        #LinList = [np.exp((A-B*(np.pi*(2*m-len(oldstate))/RealLength)**2)*timestep) for m in range(len(oldstate))]
+def nonlinde(C,D,oldstate,absol,cterm,dterm,kn):
+        np.conj(oldstate,absol)
+        np.multiply(oldstate,absol,absol)#The conjugate
+        np.multiply(absol, oldstate, cterm)
+        np.multiply(cterm,absol,dterm)
+        np.multiply(cterm, C,cterm)#all of the C term 
+        np.multiply(dterm,D,dterm)#all of the D term
+        np.add(cterm,dterm,kn)
         
-        #This line is equivalent to the 3 4 steps below. 
-        return nonlinear(timestep*0.5,C,D,linear(timestep,A,B,RealLength,LinList,pm,nonlinear(timestep*0.5,C,D,oldstate)))
+        #absolute = oldstate * oldstate.conjugate()#These steps is what I did before.
+        #return C*oldstate*absolute + D*oldstate*absolute**2
 
-        #nonlinEvolution = nonlinear(timestep*0.5,C,D,oldstate)
-        #linEvolution = linear(timestep,A,B,RealLength,LinList,nonlinEvolution)
-        #secondNonLinEvolution = nonlinear(timestep*0.5,C,D,linEvolution)
-        #return secondNonLinEvolution
+def nonlinear(C,D,oldstate,k1,k2,k3,k4,ksum,absol,cterm,dterm):
+#Doing this allowed me to save ~0.5sec, so I might as well leave it here.
+    nonlinde(C,D,oldstate,absol,cterm,dterm,k1)#k1
+    np.multiply(k1,0.5,ksum)
+    np.add(oldstate,ksum,ksum)
+    nonlinde(C,D,ksum,absol,cterm,dterm,k2)#k2
+    np.multiply(k2,0.5,ksum)
+    np.add(k2,oldstate,ksum)
+    nonlinde(C,D,ksum,absol,cterm,dterm,k3)#k4
+    np.add(k2,oldstate,ksum)
+    nonlinde(C,D,ksum,absol,cterm,dterm,k4)#k4
+    #The code above is the same as this, but below is a bit easier to read:
+    #nonlinde(C,D,oldstate,absol,cterm,dterm,k1)
+    #nonlinde(C,D,oldstate+k1*0.5,absol,cterm,dterm,k2)
+    #nonlinde(C,D,oldstate+k2*0.5,absol,cterm,dterm,k3)
+    #nonlinde(C,D,oldstate+k3,absol,cterm,dterm,k4)
 
-def onestepgenerator(timestep,A,B,C,D,RealLength,LinList,pm,oldstate):
-        yield oldstate
-        current_state = oldstate
-        halftime = timestep*0.5
+    np.add(k1,k4,k1)
+    np.add(k2,k3,k2)
+    np.multiply(k2,2,k2)
+    np.add(k2,k1,k1)
+    np.multiply(k1,1/6.,k1)
+    np.add(k1,oldstate,oldstate)
+    #return oldstate+(k1+2*k2+2*k3+k4)/6.#The same as above, but a bit faster
+
+def newgenerator(timestep,A,B,C,D,RealLength,initial_state): #This finds the fastest FFT method once, and uses this many times.
+        xSteps = len(initial_state)
+        current_state = pyfftw.empty_aligned(xSteps, dtype='complex128')#n_byte_align_empty
+        fourier_state = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        fft_object = pyfftw.FFTW(current_state, fourier_state)
+        ifft_object = pyfftw.FFTW(fourier_state, current_state, direction='FFTW_BACKWARD')
+        
+        current_state[:] = initial_state
+        
+        LinList = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        LinList[:] = np.array([np.exp((A-B*(np.pi*(2*m-xSteps)/RealLength)**2)*timestep) for m in range(xSteps)])
+        pm = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        pm[:] = np.array([(-1)**m for m in range(xSteps)])
+        
+        c=C*timestep/2. #This is so we don't need to multiply by the timestep many times
+        d=D*timestep/2. #The half is because we do N(t/2) L(t) N(t/2),
+        
+        k1 = pyfftw.empty_aligned(xSteps, dtype='complex128')#These arrays are here so I don't need to reallocate memory to save temporary files
+        k2 = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        k3 = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        k4 = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        ksum = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        absol = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        cterm = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        dterm = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        yield list(current_state)
         while True:
-                current_state = onestep(timestep,A,B,C,D,RealLength,LinList,pm,current_state)#nonlinear(halftime,C,D,linear(timestep,A,B,RealLength,LinList,pm,nonlinear(halftime,C,D,current_state)))
-                yield current_state
-        
-
+                #np.multiply(nonlinear(c,d,current_state,k1,k2,k3,k4,absol,cterm,dterm),pm,current_state)
+                nonlinear(c,d,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm)
+                np.multiply(current_state,pm,current_state)
+                fft_object()
+                np.multiply(fourier_state,LinList,fourier_state)
+                ifft_object()
+                np.multiply(current_state,pm,current_state)
+                
+                #current_state[:] = nonlinear(c,d,current_state,k1,k2,k3,k4,absol,cterm,dterm)
+                nonlinear(c,d,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm)
+                yield list(current_state)
 
 def alltime(timestep,numtimesteps,A,B,C,D,RealLength,oldstate):
-    allsteps = oldstate
-    newstep = oldstate
-    LinList = np.array([np.exp((A-B*(np.pi*(2*m-len(oldstate))/RealLength)**2)*timestep) for m in range(len(oldstate))])
-    pm = np.array([(-1)**m for m in range(len(oldstate))])
-
-    #import time
-    
-    #t1 = time.time()
-    #print("Starting Now")
-
-    
-    gen = onestepgenerator(timestep,A,B,C,D,RealLength,LinList,pm,oldstate)
+    gen = newgenerator(timestep,A,B,C,D,RealLength,oldstate)
     return [gen.next() for i in range(int(numtimesteps))]
-    
-
-    #t2 = time.time()
-    
-    #for i in range(int(numtimesteps)-1):
-    #    newstep = onestep(timestep,A,B,C,D,RealLength,LinList,pm,newstep)
-    #    allsteps2 = np.vstack((allsteps,newstep))
-    #t3 = time.time()
-
-    #print("Method 1 took %f seconds" % (t2-t1))
-    #print("Method 2 took %f seconds" % (t3-t2))
-    #return allsteps2
-
-
-
-
-
-
 
 
 
 
 
 #Put in a single value and get the evolution from the nonlinear part.
-def testRK(timestep,numtimesteps,C,D,oldstate):
-    oldstate = [oldstate,0,0,0]
-    allsteps = oldstate
-    newstep = oldstate
-    for i in range(int(numtimesteps)):
-        newstep = nonlinear(timestep,C,D,newstep)
-        allsteps = np.vstack((allsteps,newstep))
-    return allsteps
-
 if 0: #this is to test if the nonlinear part is working
+        def testRK(timestep,numtimesteps,C,D,oldstate):
+                oldstate = [oldstate,0,0,0]
+                allsteps = oldstate
+                newstep = oldstate
+                for i in range(int(numtimesteps)):
+                        newstep = nonlinear(timestep,C,D,newstep)
+                        allsteps = np.vstack((allsteps,newstep))
+                return allsteps
         c=0.1+0.4*1j
         d=-0.1+0.1*1j
         initial_value = 1.
@@ -145,26 +113,16 @@ if 0: #this is to test if the nonlinear part is working
         plt.show()
 
 
-
-
-
-
-
-
-
-
-
-
-def testLin(timestep,numtimesteps,A,B,RealLength,oldstate):
-    allsteps = oldstate
-    newstep = oldstate
-    for i in range(int(numtimesteps)):
-        newstep = linear(timestep,A,B,RealLength,newstep)
-        allsteps = np.vstack((allsteps,newstep))
-    return allsteps
-
 if 0: #this is to test if the linear part is working
         #Make sure you run the mathematica code before you run this code.
+        def testLin(timestep,numtimesteps,A,B,RealLength,oldstate):
+            allsteps = oldstate
+            newstep = oldstate
+            for i in range(int(numtimesteps)):
+                newstep = linear(timestep,A,B,RealLength,newstep)
+                allsteps = np.vstack((allsteps,newstep))
+            return allsteps
+        
         a=3.+0.5*1j
         b=0.5-1j
 
@@ -174,7 +132,6 @@ if 0: #this is to test if the linear part is working
         
         def initPsi(x):
                 return np.sin(np.pi*np.cos(x))
-        
         
         initial_state = [initPsi(x) for x in xpos]
         finaltime = 10.
@@ -200,102 +157,3 @@ if 0: #this is to test if the linear part is working
                 plt.plot(xpos, np.real(finalState),'b-')
                 plt.plot(xpos, np.real(mathlin),'g-')
                 plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-#Put in a single value and get the evolution from the nonlinear part.
-def testRK(timestep,numtimesteps,C,D,oldstate):
-    oldstate = [oldstate,0,0,0]
-    allsteps = oldstate
-    newstep = oldstate
-    for i in range(int(numtimesteps)):
-        newstep = nonlinear(timestep,C,D,newstep)
-        allsteps = np.vstack((allsteps,newstep))
-    return allsteps
-
-if 0: #this is to test if the nonlinear part is working
-        c=0.1+0.4*1j
-        d=-0.1+0.1*1j
-        initial_value = 1.
-        finaltime = 1.
-        
-        timestep = 0.1
-
-        allsteps = testRK(timestep,1.*finaltime/timestep,c,d,initial_value)[0:,0]#The last bit selects the first collumn. Only the first collumn contains interesting info, but all of it is needed to generate the output.
-        print allsteps[-1]
-        import matplotlib.pyplot as plt
-
-        timearr = np.arange(0,finaltime+timestep,timestep)
-        print np.shape(timearr)
-        #print allsteps
-        plt.plot(timearr, np.real(allsteps))
-        plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-def testLin(timestep,numtimesteps,A,B,RealLength,oldstate):
-    allsteps = oldstate
-    newstep = oldstate
-    for i in range(int(numtimesteps)):
-        newstep = linear(timestep,A,B,RealLength,newstep)
-        allsteps = np.vstack((allsteps,newstep))
-    return allsteps
-
-if 0: #this is to test if the linear part is working
-        #Make sure you run the mathematica code before you run this code.
-        a=3.+0.5*1j
-        b=0.5-1j
-
-        RealLength = 2*np.pi
-        xstep = 0.001
-        xpos = np.arange(0,RealLength,xstep)
-        
-        def initPsi(x):
-                return np.sin(np.pi*np.cos(x))
-        
-        
-        initial_state = [initPsi(x) for x in xpos]
-        finaltime = 10.
-        timestep = 0.01
-
-        allsteps = testLin(timestep,1.*finaltime/timestep,a,b,RealLength, initial_state)
-        finalState = allsteps[-1]
-
-        import matplotlib.pyplot as plt
-        if 1:               
-                importdata = np.genfromtxt("testlinear.csv", delimiter = ',')
-                mathlin = [i[0]+1j*i[1] for i in importdata]
-
-                
-
-                maxval = max(abs(finalState))
-                percentError = [100*abs(P-M)/maxval for P,M in zip(finalState,mathlin)]
-                print "Max percent error = " + str(max(percentError))+ "%"
-                plt.plot(xpos, percentError)
-                plt.show()
-        
-        if 1:
-                plt.plot(xpos, np.real(finalState),'b-')
-                plt.plot(xpos, np.real(mathlin),'g-')
-                plt.show()
-
-
-
