@@ -40,32 +40,43 @@ def maxmin(x):
 vmaxmin=np.vectorize(maxmin)
 
 def plot(intensity, title="", name='a'):
-  if 1:#This saves the data
-      np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".csv", intensity, delimiter=",")
-  if 0:#This plots the initial intensity profile, the next intensity profile, and the final intensity profile
-        plt.close()
-        plt.cla()
-        plt.clf()
-        xlist = range(len(intensity[0]))
-        plt.plot(xlist,intensity[0],'b-')
-        #plt.plot(xlist,intensity[-1],'r-')
-        plt.show()
+  if 0:#This saves ALL the data
+      np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+"_AllData.csv", np.array(intensity).view(float), delimiter=",")
+  if 1:#This saves the last intensity profile
+      pathToCSV = g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".csv"
+      np.savetxt(pathToCSV, np.array(intensity[-1]).view(float))
+
+
+  if g.solve['tpixels']>len(intensity) or g.solve['xpixels']>len(intensity[0]) or g.solve['tpixels']==0 or g.solve['xpixels']==0:
+            if g.solve['absreal']=='1':
+                small_intensity = np.real(intensity)
+            else:
+                small_intensity = np.abs(intensity)
+  else:#This saves a small version of the data
+            tmissed = int(round(len(intensity)/g.solve['tpixels'])) #number of pixels missed for each used in the t direction
+            xmissed = int(round(len(intensity[0])/g.solve['xpixels'])) #number of pixels missed for each used in the x direction
+            if g.solve['absreal']=='1':
+                small_intensity = np.real([[value for j,value in enumerate(data) if j%xmissed==0] for i,data in enumerate(intensity) if i%tmissed==0])
+            else:
+                small_intensity = np.abs([[value for j,value in enumerate(data) if j%xmissed==0] for i,data in enumerate(intensity) if i%tmissed==0])
+            
+
 
   if 0:#This plots the data using matplotlib
     
-    np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".csv", intensity, delimiter=",")
+    np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".csv", small_intensity, delimiter=",")
 
     plt.close()
     plt.cla()
     plt.clf()
     rows,cols = np.shape(intensity)
     if cols<rows:
-        intensity = intensity[-cols:]
+        small_intensity = small_intensity[-cols:]
     #fig = matplotlib.figure.Figure
     fig = plt.figure()
     ax = fig.add_subplot(111, aspect='equal')
     cmap = cm.get_cmap('hot_r')
-    cs = plt.pcolor(intensity, cmap = cmap)
+    cs = plt.pcolor(small_intensity, cmap = cmap)
     cb = plt.colorbar(cs, orientation='vertical')
     plt.title(title)
     plt.savefig(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".png")
@@ -75,9 +86,16 @@ def plot(intensity, title="", name='a'):
     def normalisedata(I):
         I = np.array(I)
         return (((I.max()-I) / (I.max() - I.min())) * 255.9).astype(np.uint8)
-    img = Image.fromarray(np.flipud(normalisedata(intensity)))
+    img = Image.fromarray(np.flipud(normalisedata(small_intensity)))
     img.save(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".png")
-
+  if 0:#This plots the initial intensity profile, the next intensity profile, and the final intensity profile
+        plt.close()
+        plt.cla()
+        plt.clf()
+        xlist = range(len(small_intensity[0]))
+        plt.plot(xlist,small_intensity[0],'b-')
+        #plt.plot(xlist,small_intensity[-1],'r-')
+        plt.show()
 
 def make1D():
     global psi,savelist

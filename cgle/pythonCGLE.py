@@ -1,6 +1,7 @@
 import numpy as np
 import pyfftw
-
+import multiprocessing
+import sys
 def nonlinde(C,D,oldstate,absol,cterm,dterm,kn):
         np.conj(oldstate,absol)
         np.multiply(oldstate,absol,absol)#The conjugate
@@ -38,12 +39,16 @@ def nonlinear(C,D,oldstate,k1,k2,k3,k4,ksum,absol,cterm,dterm):
     np.add(k1,oldstate,oldstate)
     #return oldstate+(k1+2*k2+2*k3+k4)/6.#The same as above, but a bit faster
 
+
+
+
+
 def newgenerator(timestep,A,B,C,D,RealLength,initial_state): #This finds the fastest FFT method once, and uses this many times.
         xSteps = len(initial_state)
         current_state = pyfftw.empty_aligned(xSteps, dtype='complex128')#n_byte_align_empty
         fourier_state = pyfftw.empty_aligned(xSteps, dtype='complex128')
-        fft_object = pyfftw.FFTW(current_state, fourier_state)
-        ifft_object = pyfftw.FFTW(fourier_state, current_state, direction='FFTW_BACKWARD')
+        fft_object = pyfftw.FFTW(current_state, fourier_state, threads=multiprocessing.cpu_count())
+        ifft_object = pyfftw.FFTW(fourier_state, current_state, direction='FFTW_BACKWARD', threads=multiprocessing.cpu_count())
         
         current_state[:] = initial_state
         
@@ -52,8 +57,8 @@ def newgenerator(timestep,A,B,C,D,RealLength,initial_state): #This finds the fas
         pm = pyfftw.empty_aligned(xSteps, dtype='complex128')
         pm[:] = np.array([(-1)**m for m in range(xSteps)])
         
-        c=C*timestep/2. #This is so we don't need to multiply by the timestep many times
-        d=D*timestep/2. #The half is because we do N(t/2) L(t) N(t/2),
+        ctime=C*timestep/2. #This is so we don't need to multiply by the timestep many times
+        dtime=D*timestep/2. #The half is because we do N(t/2) L(t) N(t/2),
         
         k1 = pyfftw.empty_aligned(xSteps, dtype='complex128')#These arrays are here so I don't need to reallocate memory to save temporary files
         k2 = pyfftw.empty_aligned(xSteps, dtype='complex128')
@@ -63,26 +68,27 @@ def newgenerator(timestep,A,B,C,D,RealLength,initial_state): #This finds the fas
         absol = pyfftw.empty_aligned(xSteps, dtype='complex128')
         cterm = pyfftw.empty_aligned(xSteps, dtype='complex128')
         dterm = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        
         yield list(current_state)
         while True:
-                #np.multiply(nonlinear(c,d,current_state,k1,k2,k3,k4,absol,cterm,dterm),pm,current_state)
-                nonlinear(c,d,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm)
+                nonlinear(ctime,dtime,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm)
                 np.multiply(current_state,pm,current_state)
                 fft_object()
                 np.multiply(fourier_state,LinList,fourier_state)
                 ifft_object()
                 np.multiply(current_state,pm,current_state)
-                
-                #current_state[:] = nonlinear(c,d,current_state,k1,k2,k3,k4,absol,cterm,dterm)
-                nonlinear(c,d,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm)
+                nonlinear(ctime,dtime,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm)
                 yield list(current_state)
 
 def alltime(timestep,numtimesteps,A,B,C,D,RealLength,oldstate):
     gen = newgenerator(timestep,A,B,C,D,RealLength,oldstate)
-    return [gen.next() for i in range(int(numtimesteps))]
-
-
-
+    
+    
+    if sys.version_info<(3,0):#I don't know what version generator.next() changes to next(generator)
+            return [gen.next() for i in range(int(numtimesteps))]
+            
+    else:            
+            return [next(gen) for i in range(int(numtimesteps))]
 
 
 #Put in a single value and get the evolution from the nonlinear part.
@@ -103,11 +109,10 @@ if 0: #this is to test if the nonlinear part is working
         timestep = 0.1
 
         allsteps = testRK(timestep,1.*finaltime/timestep,c,d,initial_value)[0:,0]#The last bit selects the first collumn. Only the first collumn contains interesting info, but all of it is needed to generate the output.
-        print allsteps[-1]
         import matplotlib.pyplot as plt
 
         timearr = np.arange(0,finaltime+timestep,timestep)
-        print np.shape(timearr)
+        print(np.shape(timearr))
         #print allsteps
         plt.plot(timearr, np.real(allsteps))
         plt.show()
@@ -149,7 +154,7 @@ if 0: #this is to test if the linear part is working
 
                 maxval = max(abs(finalState))
                 percentError = [100*abs(P-M)/maxval for P,M in zip(finalState,mathlin)]
-                print "Max percent error = " + str(max(percentError))+ "%"
+                print("Max percent error = " + str(max(percentError))+ "%")
                 plt.plot(xpos, percentError)
                 plt.show()
         
