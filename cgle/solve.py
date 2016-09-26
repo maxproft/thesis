@@ -42,10 +42,6 @@ vmaxmin=np.vectorize(maxmin)
 def plot(intensity, title="", name='a'):
   if 0:#This saves ALL the data
       np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+"_AllData.csv", np.array(intensity).view(float), delimiter=",")
-  if 1:#This saves the last intensity profile
-      pathToCSV = g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".csv"
-      np.savetxt(pathToCSV, np.array(intensity[-1]).view(float))
-
 
   if g.solve['tpixels']>len(intensity) or g.solve['xpixels']>len(intensity[0]) or g.solve['tpixels']==0 or g.solve['xpixels']==0:
             if g.solve['absreal']=='1':
@@ -69,7 +65,7 @@ def plot(intensity, title="", name='a'):
     plt.close()
     plt.cla()
     plt.clf()
-    rows,cols = np.shape(intensity)
+    rows,cols = np.shape(small_intensity)
     if cols<rows:
         small_intensity = small_intensity[-cols:]
     #fig = matplotlib.figure.Figure
@@ -88,13 +84,28 @@ def plot(intensity, title="", name='a'):
         return (((I.max()-I) / (I.max() - I.min())) * 255.9).astype(np.uint8)
     img = Image.fromarray(np.flipud(normalisedata(small_intensity)))
     img.save(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+".png")
-  if 0:#This plots the initial intensity profile, the next intensity profile, and the final intensity profile
+  if 0:#This plots an intensity profile
         plt.close()
         plt.cla()
         plt.clf()
-        xlist = range(len(small_intensity[0]))
-        plt.plot(xlist,small_intensity[0],'b-')
+        #ylist = small_intensity[-150] #Intensity profile
+        ylist = small_intensity[:,int(len(small_intensity[0])/2)]#Plots the centre line of the centre of the image
+        xlist = range(len(ylist))
+        plt.plot(xlist,ylist,'b-')
         #plt.plot(xlist,small_intensity[-1],'r-')
+        plt.show()
+  if 1:#Energy vs t
+        plt.close()
+        plt.cla()
+        plt.clf()
+        dx = float(g.solve['xtotal'])/len(small_intensity[0])
+        tpix = int(round(len(small_intensity)/200.))#This allows us to only plot ~200 points
+                
+        temparr = np.array([data for i,data in enumerate(small_intensity) if i%tpix==0])
+        np.multiply(temparr,temparr,temparr)
+        ylist = np.sum(temparr,axis=1)*dx        
+        xlist = range(len(ylist))
+        plt.plot(xlist,ylist,'b-')
         plt.show()
 
 def make1D():

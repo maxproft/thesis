@@ -66,17 +66,20 @@ def getgui(): #Put the numbers from the gui, into g.solve
         g.solve['xstep']=float(g.solve['xtotal'])/len(g.solve['psi'])
         if 1:
             #size = int(float(g.solve['xtotal'])/float(g.solve['xstep']))
-            array=cgle.alltime(np.float32(g.solve['tstep']),np.float(g.solve['ttotal'])/np.float(g.solve['tstep']),
-                           g.solve['A'],g.solve['B'],g.solve['C'],g.solve['D'],np.float32(g.solve['xtotal']),np.complex64(g.solve['psi']))
+            pathToCSV = g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(g.solve['name'])+".csv"
+            array=cgle.alltime(np.float32(g.solve['tstep']),np.float(g.solve['ttotal'])/np.float(g.solve['tstep']),g.solve['tpixels'],
+                           g.solve['A'],g.solve['B'],g.solve['C'],g.solve['D'],np.float32(g.solve['xtotal']),g.solve['xpixels'],pathToCSV,np.complex64(g.solve['psi']))
             print("Finished making data")
             plot(array,name = g.solve['name'])
 
     else:
+        pathToCSV = g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(g.solve['name'])+".csv"
         size = int(float(g.solve['xtotal'])/float(g.solve['xstep']))
         psi = np.complex64([ TrialFunction((y-size/2.)*float(g.solve['xstep'])-float(g.solve['par3'])) for y in range(size)])
-        intensity=cgle.alltime(np.float32(g.solve['tstep']),np.float(g.solve['ttotal'])/np.float(g.solve['tstep']),
-                           g.solve['A'],g.solve['B'],g.solve['C'],g.solve['D'],np.float32(g.solve['xtotal']),psi)
+        intensity=cgle.alltime(np.float32(g.solve['tstep']),np.float(g.solve['ttotal'])/np.float(g.solve['tstep']),g.solve['tpixels'],
+                           g.solve['A'],g.solve['B'],g.solve['C'],g.solve['D'],np.float32(g.solve['xtotal']),g.solve['xpixels'],pathToCSV,psi)
         print("Finished making data")
+        print(np.shape(intensity))
         plot(intensity, name = g.solve['name'])
 
 

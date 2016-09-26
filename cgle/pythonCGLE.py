@@ -2,53 +2,58 @@ import numpy as np
 import pyfftw
 import multiprocessing
 import sys
-def nonlinde(C,D,oldstate,absol,cterm,dterm,kn):
-        np.conj(oldstate,absol)
-        np.multiply(oldstate,absol,absol)#The conjugate
-        np.multiply(absol, oldstate, cterm)
-        np.multiply(cterm,absol,dterm)
-        np.multiply(cterm, C,cterm)#all of the C term 
-        np.multiply(dterm,D,dterm)#all of the D term
-        np.add(cterm,dterm,kn)
-        
-        #absolute = oldstate * oldstate.conjugate()#These steps is what I did before.
-        #return C*oldstate*absolute + D*oldstate*absolute**2
+def nonlinde(C,D,oldstate,absol,cterm,dterm,tempterm,kn):
+        np.conj(oldstate,tempterm)#The conjugate
+        np.multiply(oldstate,tempterm,absol)#The absolute value
+        np.multiply(absol, oldstate, tempterm)#this is most of the c term
+        np.multiply(tempterm,absol,kn)#this is most of the d term
+        np.multiply(tempterm, C, cterm)#all of the C term 
+        np.multiply(kn,D,dterm)#all of the D term
+        np.add(cterm,dterm,kn)#this is the k_n runge kutta term
 
-def nonlinear(C,D,oldstate,k1,k2,k3,k4,ksum,absol,cterm,dterm):
+#above is equivalent to this:
+#absolute = oldstate * oldstate.conjugate()#These steps is what I did before.
+#return C*oldstate*absolute + D*oldstate*absolute**2
+
+def nonlinear(C,D,oldstate,k1,k2,k3,k4,ksum,absol,cterm,dterm,tempterm):
 #Doing this allowed me to save ~0.5sec, so I might as well leave it here.
-    nonlinde(C,D,oldstate,absol,cterm,dterm,k1)#k1
-    np.multiply(k1,0.5,ksum)
-    np.add(oldstate,ksum,ksum)
-    nonlinde(C,D,ksum,absol,cterm,dterm,k2)#k2
-    np.multiply(k2,0.5,ksum)
-    np.add(k2,oldstate,ksum)
-    nonlinde(C,D,ksum,absol,cterm,dterm,k3)#k4
-    np.add(k2,oldstate,ksum)
-    nonlinde(C,D,ksum,absol,cterm,dterm,k4)#k4
-    #The code above is the same as this, but below is a bit easier to read:
-    #nonlinde(C,D,oldstate,absol,cterm,dterm,k1)
-    #nonlinde(C,D,oldstate+k1*0.5,absol,cterm,dterm,k2)
-    #nonlinde(C,D,oldstate+k2*0.5,absol,cterm,dterm,k3)
-    #nonlinde(C,D,oldstate+k3,absol,cterm,dterm,k4)
+    nonlinde(C,D,oldstate,absol,cterm,dterm,tempterm,k1)#k1
+    np.multiply(k1,0.5,tempterm)
+    np.add(oldstate,tempterm,ksum)
+    nonlinde(C,D,ksum,absol,cterm,dterm,tempterm,k2)#k2
+    np.multiply(k2,0.5,tempterm)
+    np.add(oldstate,tempterm,ksum)
+    nonlinde(C,D,ksum,absol,cterm,dterm,tempterm,k3)#k4
+    np.add(oldstate,k2,ksum)
+    nonlinde(C,D,ksum,absol,cterm,dterm,tempterm,k4)#k4
 
-    np.add(k1,k4,k1)
-    np.add(k2,k3,k2)
-    np.multiply(k2,2,k2)
-    np.add(k2,k1,k1)
-    np.multiply(k1,1/6.,k1)
-    np.add(k1,oldstate,oldstate)
+
+    np.add(k1,k4,tempterm)#k1+k4
+    np.add(k2,k3,dterm)#using dterm as a temp now, k2+k3
+    np.multiply(dterm,2.,k2)#2*(k2+k3), using k2 as a dummy
+    np.add(k2,tempterm,dterm)#k1+2*k2+2*k3+k4
+    np.multiply(dterm,1/6.,tempterm)#dividing by 6
+    np.add(tempterm,oldstate,oldstate)#adding to oldstate
     #return oldstate+(k1+2*k2+2*k3+k4)/6.#The same as above, but a bit faster
 
 
+def linear(current_state,fourier_state,LinList,pm,fft_object,ifft_object):
+        np.multiply(current_state,pm,current_state)
+        fft_object()
+        np.multiply(fourier_state,LinList,fourier_state)
+        ifft_object()
+        np.multiply(current_state,pm,current_state)
 
 
 
-def newgenerator(timestep,A,B,C,D,RealLength,initial_state): #This finds the fastest FFT method once, and uses this many times.
+def newgenerator(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,pathToCSV,initial_state): #This finds the fastest FFT method once, and uses this many times.
+        #It is currently LNL. To make it go NLN, change LinList, ctime, dtime, and make the loops work this way.
         xSteps = len(initial_state)
         current_state = pyfftw.empty_aligned(xSteps, dtype='complex128')#n_byte_align_empty
         fourier_state = pyfftw.empty_aligned(xSteps, dtype='complex128')
-        fft_object = pyfftw.FFTW(current_state, fourier_state, threads=multiprocessing.cpu_count())
-        ifft_object = pyfftw.FFTW(fourier_state, current_state, direction='FFTW_BACKWARD', threads=multiprocessing.cpu_count())
+        fft_object = pyfftw.FFTW(current_state, fourier_state)#, threads=multiprocessing.cpu_count())
+        ifft_object = pyfftw.FFTW(fourier_state, current_state, direction='FFTW_BACKWARD')#, threads=multiprocessing.cpu_count())
+        
         
         current_state[:] = initial_state
         
@@ -68,27 +73,45 @@ def newgenerator(timestep,A,B,C,D,RealLength,initial_state): #This finds the fas
         absol = pyfftw.empty_aligned(xSteps, dtype='complex128')
         cterm = pyfftw.empty_aligned(xSteps, dtype='complex128')
         dterm = pyfftw.empty_aligned(xSteps, dtype='complex128')
-        
-        yield list(current_state)
-        while True:
-                nonlinear(ctime,dtime,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm)
-                np.multiply(current_state,pm,current_state)
-                fft_object()
-                np.multiply(fourier_state,LinList,fourier_state)
-                ifft_object()
-                np.multiply(current_state,pm,current_state)
-                nonlinear(ctime,dtime,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm)
-                yield list(current_state)
+        tempterm = pyfftw.empty_aligned(xSteps, dtype='complex128')
 
-def alltime(timestep,numtimesteps,A,B,C,D,RealLength,oldstate):
-    gen = newgenerator(timestep,A,B,C,D,RealLength,oldstate)
-    
-    
-    if sys.version_info<(3,0):#I don't know what version generator.next() changes to next(generator)
-            return [gen.next() for i in range(int(numtimesteps))]
-            
-    else:            
-            return [next(gen) for i in range(int(numtimesteps))]
+        if len(current_state)>xpixels:
+                xyieldnum = int(len(current_state)/xpixels)
+        else:
+                xyieldnum = len(current_state)
+
+        if numtimesteps>tpixels:
+                noYieldList = range(int(round(numtimesteps*1./tpixels)))
+                YieldList = range(int(tpixels)-2)#The minus 2 is because I have already yielded one row, and because I want to save the fina current_state
+        else:
+                noYieldList =[0]
+                YieldList = range(int(numtimesteps))
+        
+        yield list(current_state[0::xyieldnum])
+
+        for i in YieldList:
+            for j in noYieldList:
+                #linear(current_state,fourier_state,LinList,pm,fft_object,ifft_object)
+                nonlinear(ctime,dtime,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm,tempterm)
+                linear(current_state,fourier_state,LinList,pm,fft_object,ifft_object)
+                nonlinear(ctime,dtime,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm,tempterm)
+            yield list(current_state[0::xyieldnum])
+
+        #I want to save only the final current_state, so I need to repeat the above code.
+        #linear(current_state,fourier_state,LinList,pm,fft_object,ifft_object)
+        nonlinear(ctime,dtime,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm,tempterm)
+        linear(current_state,fourier_state,LinList,pm,fft_object,ifft_object)
+        nonlinear(ctime,dtime,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm,tempterm)
+        
+        np.savetxt(pathToCSV, np.array(current_state).view(float))
+        
+        yield list(current_state[0::xyieldnum])
+
+def alltime(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,name,oldstate):
+    print("start")
+    gen = newgenerator(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,name,oldstate)
+    return list(gen)
+
 
 
 #Put in a single value and get the evolution from the nonlinear part.
