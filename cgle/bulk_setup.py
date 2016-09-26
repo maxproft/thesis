@@ -24,7 +24,7 @@ def params_for_multi(subfolder):
             i+=1
 
     identity = IdGen()
-    timestep = 0.001
+    timestep = 0.01
     numtimesteps = 10000.
     tpixels = 800
     deltaList = np.linspace(-0.12,-0.08,num=5)

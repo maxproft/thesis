@@ -2,7 +2,7 @@
 
 echo -e "\nMaking Subfolder and Data for CPUs"
 subfolder='folder'
-python3.4 bulk_setup.py $subfolder
+python bulk_setup.py $subfolder
 echo -e "\n "
 
 #Total number of cpus
@@ -12,7 +12,8 @@ CPUsMinus="$(($cpucores-1))"
 
 
 for cpuid in $(seq 0 $CPUsMinus)
-      do python3.4 bulk_run.py $subfolder $cpuid &
+      #The default python version is used
+      do python bulk_run.py $subfolder $cpuid &
 done
 
 

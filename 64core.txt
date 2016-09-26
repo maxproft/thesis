@@ -1,3 +1,7 @@
 ssh -Y mwp109@rsphysse.anu.edu.au
 ssh -Y mwp109@scucomp4.anu.edu.au
 source ~/MyVenv/bin/activate
+
+gnome-system-monitor
+
+
