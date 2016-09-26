@@ -1,6 +1,5 @@
 import numpy as np
 import pyfftw
-import multiprocessing
 import sys
 def nonlinde(C,D,oldstate,absol,cterm,dterm,tempterm,kn):
         np.conj(oldstate,tempterm)#The conjugate
@@ -51,8 +50,8 @@ def newgenerator(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,pathTo
         xSteps = len(initial_state)
         current_state = pyfftw.empty_aligned(xSteps, dtype='complex128')#n_byte_align_empty
         fourier_state = pyfftw.empty_aligned(xSteps, dtype='complex128')
-        fft_object = pyfftw.FFTW(current_state, fourier_state)#, threads=multiprocessing.cpu_count())
-        ifft_object = pyfftw.FFTW(fourier_state, current_state, direction='FFTW_BACKWARD')#, threads=multiprocessing.cpu_count())
+        fft_object = pyfftw.FFTW(current_state, fourier_state)
+        ifft_object = pyfftw.FFTW(fourier_state, current_state, direction='FFTW_BACKWARD')
         
         
         current_state[:] = initial_state
@@ -76,9 +75,9 @@ def newgenerator(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,pathTo
         tempterm = pyfftw.empty_aligned(xSteps, dtype='complex128')
 
         if len(current_state)>xpixels:
-                xyieldnum = int(len(current_state)/xpixels)
+                xyieldnum = int(round(len(current_state)*1./xpixels))
         else:
-                xyieldnum = len(current_state)
+                xyieldnum = 1#len(current_state)
 
         if numtimesteps>tpixels:
                 noYieldList = range(int(round(numtimesteps*1./tpixels)))
@@ -107,9 +106,8 @@ def newgenerator(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,pathTo
         
         yield list(current_state[0::xyieldnum])
 
-def alltime(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,name,oldstate):
-    print("start")
-    gen = newgenerator(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,name,oldstate)
+def alltime(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,pathToCSV,oldstate):
+    gen = newgenerator(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,pathToCSV,oldstate)
     return list(gen)
 
 

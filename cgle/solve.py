@@ -42,6 +42,7 @@ vmaxmin=np.vectorize(maxmin)
 def plot(intensity, title="", name='a'):
   if 0:#This saves ALL the data
       np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+"_AllData.csv", np.array(intensity).view(float), delimiter=",")
+  
 
   if g.solve['tpixels']>len(intensity) or g.solve['xpixels']>len(intensity[0]) or g.solve['tpixels']==0 or g.solve['xpixels']==0:
             if g.solve['absreal']=='1':

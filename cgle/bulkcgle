@@ -1,0 +1,18 @@
+#!/bin/bash
+
+echo -e "\nMaking Subfolder and Data for CPUs"
+subfolder='folder'
+python3.4 bulk_setup.py $subfolder
+echo -e "\n "
+
+#Total number of cpus
+cpucores=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu)
+#1 fewer than the number of cpus
+CPUsMinus="$(($cpucores-1))"
+
+
+for cpuid in $(seq 0 $CPUsMinus)
+      do python3.4 bulk_run.py $subfolder $cpuid &
+done
+
+
