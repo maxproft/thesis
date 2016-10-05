@@ -3,7 +3,7 @@ import numpy as np
 import os,sys
 import multiprocessing as mp
 import pickle
-
+#import numpy.random.uniform as uni
 def params_for_multi(subfolder):
 
     currentfolder = os.getcwd()
@@ -25,21 +25,34 @@ def params_for_multi(subfolder):
 
     identity = IdGen()
     timestep = 0.01
-    numtimesteps = 10000.
+    numtimesteps = 5000.
     tpixels = 800
-    deltaList = np.linspace(-0.5,0.1,num=5)
-    betaList = np.linspace(0.,0.2,num=4)
-    DList = [-1.,1.]#np.linspace(-1.5,1.5,num=7)
-    epsilonList = np.linspace(0.5,1.,num=4)
-    muList = np.linspace(-0.13,-0.07,num=5)
-    nuList = np.linspace(-0.05,-0.11,num=5)
+    deltaList =(-0.5,0.1) #np.linspace(-0.5,0.1,num=5)
+    betaList = (0.,0.2)#np.linspace(0.,0.2,num=4)
+    DList = (-1.5,1.5)#np.linspace(-1.5,1.5,num=7)
+    epsilonList = (0.5,1.) #np.linspace(0.5,1.,num=4)
+    muList = (-0.13,-0.07)#np.linspace(-0.13,-0.07,num=5)
+    nuList = (-0.05,-0.11)#np.linspace(-0.05,-0.11,num=5)
     RealLength = 40.
     xpixels = 800
     xres = 0.01
     oldstate = [2*np.exp(-x**2/9) for x in np.arange(-RealLength/2.,RealLength/2.,xres)]
 
-    allparams = list([[next(identity), timestep,numtimesteps, tpixels,delta,beta,D,epsilon,mu,nu,RealLength,xpixels,pathToSubfolder,oldstate]
-             for delta in deltaList   for beta in betaList   for D in DList   for epsilon in epsilonList   for mu in muList   for nu in nuList])
+    def uni(mytup):
+        a,b = mytup
+        return float(np.random.uniform(a,b))
+
+    
+    numsimulations = 64*1200
+    allparams = list([[next(identity), timestep,numtimesteps, tpixels,
+                  uni(deltaList),uni(betaList),uni(DList),uni(epsilonList),uni(muList),uni(nuList),
+                  RealLength,xpixels,pathToSubfolder,oldstate] for i in range(numsimulations)])
+    #print(allparams)
+             
+    #allparams = list([[next(identity), timestep,numtimesteps, tpixels,delta,beta,D,epsilon,mu,nu,RealLength,xpixels,pathToSubfolder,oldstate]
+             #for delta in deltaList   for beta in betaList   for D in DList   for epsilon in epsilonList   for mu in muList   for nu in nuList])
+
+    
 
 
 #This is saved in the following way:

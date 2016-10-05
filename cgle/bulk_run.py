@@ -11,11 +11,11 @@ import peakutils
 ########   Test if a list is not a soliton, has Nan, etc.    ##################
 def periodicDist(x,centre,L):
         if x<centre-L*0.5:
-                return abs(L-centre+x)
+                return x-centre+L
         elif x>centre+L*0.5:
-            return abs(centre+L-x)
+            return x-centre-L
         else:
-            return abs(centre-x)
+            return x-centre
 
 def baddata(state):
         absol = np.abs(state)
@@ -40,13 +40,15 @@ def baddata(state):
         else:
                 return True
 
-def std(data,xlength):
-        prob = np.abs(data)/np.sum(np.abs(data))
+def std(data,xlength,distlist):
+        absol = np.abs(data)
+        prob = absol/np.sum(absol)
+        
         L=len(data)
         xlist = range(L)
         centre = np.argmax(prob)
-        mean = np.sum([periodicDist(x,centre,L)*p for x,p in zip(xlist,prob)])
-        std = np.sqrt(np.sum(  [p*periodicDist(x,mean,L)**2 for x,p in zip(xlist,prob)]))
+        mean = np.dot(distlist,prob)
+        std = np.sqrt(np.dot(prob,distlist**2))
         return std*xlength/L
 
 ######    find the period     ############
@@ -58,7 +60,7 @@ def TimeFreq(energies, T):
         const = (maximum+minimum)/2.
         t = np.array(range(len(energies)))
 
-        indexes = peakutils.indexes(np.array(energies),thres=amp/20., min_dist = 10)
+        indexes = peakutils.indexes(np.array(energies),thres=amp/10., min_dist = 10)
         if len(indexes)>1:
                 peak_dist = np.average(np.diff(indexes))
                 freq = 1.*len(energies)/(peak_dist*T)
@@ -102,25 +104,36 @@ def MakeData(inlist):
     if len(outarr)!=0:
       if baddata(outarr[-1]):
         absol = np.abs(outarr)
-        
+
+        ## Height Difference
         i,j = np.unravel_index(absol.argmax(), absol.shape)
         maxim = absol[i,j]
         minim = np.min(absol[:,j])
         HeightDiff = maxim-minim
-        
+
+        #Energy Difference
         q = np.sum(absol*absol,axis=1)*RealLength/len(absol[0])
         qDiff = max(q)-min(q)
 
-        stdlist = [std(data,RealLength) for data in outarr]
+        #Biggest STD and STD difference
+        centre = np.argmax(absol)
+        distlist = np.array([periodicDist(x,centre,len(absol[0])) for x in range(len(outarr[0]))])
+        stdlist = [std(data,RealLength,distlist) for data in outarr]
+        
         maxstd = max(stdlist)
         minstd = min(stdlist)
         stdDiff = maxstd-minstd
-
-        freq = TimeFreq(q,numtimesteps*timestep)
+        
+        #Frequency
+        if qDiff/max(q)<10**-2:
+                freq = 0.
+        else:
+                freq= TimeFreq(q,numtimesteps*timestep)
         
         np.savetxt(pathToExtra, np.array([HeightDiff,qDiff,maxstd,stdDiff,freq]),delimiter=",")
         
         BWImage(np.abs(outarr),pathToPNG)
+        
         
     #SaveAllData(outarr,pathToAllCSV) This uses ~1000 times more space on the harddrive than anything else.
 
