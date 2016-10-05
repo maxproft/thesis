@@ -1,0 +1,7 @@
+tRange 50, done 6 times, then return the 7th.
+Xwidth - 40
+tstep = 0.01
+xstep = 0.01
+
+
+

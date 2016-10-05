@@ -8,12 +8,25 @@ from PIL import Image
 
 
 def TrialFunction(dist):
+    amp=float(g.solve['par1'])
+    width = float(g.solve['par2'])
+    
+    phase = float(g.solve['par4'])
+    linear = float(g.solve['par5'])
+    chirp = float(g.solve['par6'])
+    supwidth = float(g.solve['par7'])
+    noiseamp = float(g.solve['par8'])
+
+    addNoise = noiseamp*np.exp(1j*2*np.pi*np.random.rand())
+
+    totPhase = np.exp(1j*(phase+linear*dist+chirp*dist**2))
+    
     if g.solve['trialfunction']=='0':
-        return (np.random.rand()-0.5)*float(g.solve['par1'])+1j*(np.random.rand()-0.5)*float(g.solve['par1'])
+        return (np.random.rand()-0.5)*amp+1j*(np.random.rand()-0.5)*amp
     elif g.solve['trialfunction']=='1':#sech pulse
-        return float(g.solve['par1'])*(np.cosh(dist/float(g.solve['par2']))**-1)*np.exp(1j*(float(g.solve['par4'])+float(g.solve['par5'])*dist+float(g.solve['par6'])*dist**2))
+        return amp*totPhase/np.cosh(dist/width)+addNoise
     elif g.solve['trialfunction']=='2':#Generalised Gaussian
-        return float(g.solve['par1'])*np.exp(-dist**2/float(g.solve['par2'])**2-dist**4/(4*float(g.solve['par7'])*float(g.solve['par2'])**4)+1j*float(g.solve['par6'])*dist**2)
+        return amp*totPhase*np.exp(-dist**2/(2*width**2)-dist**4/(4*supwidth**4))+addNoise
 
 def iszero(x):
     if x==0:

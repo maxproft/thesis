@@ -70,7 +70,8 @@ def getgui(): #Put the numbers from the gui, into g.solve
             array=cgle.alltime(np.float32(g.solve['tstep']),np.float(g.solve['ttotal'])/np.float(g.solve['tstep']),g.solve['tpixels'],
                            g.solve['A'],g.solve['B'],g.solve['C'],g.solve['D'],np.float32(g.solve['xtotal']),g.solve['xpixels'],pathToCSV,np.complex64(g.solve['psi']))
             print("Finished making data")
-            plot(array,name = g.solve['name'])
+            if len(array)!=0:
+                plot(array,name = g.solve['name'])
 
     else:
         pathToCSV = g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(g.solve['name'])+".csv"
@@ -79,8 +80,8 @@ def getgui(): #Put the numbers from the gui, into g.solve
         intensity=cgle.alltime(np.float32(g.solve['tstep']),np.float(g.solve['ttotal'])/np.float(g.solve['tstep']),g.solve['tpixels'],
                            g.solve['A'],g.solve['B'],g.solve['C'],g.solve['D'],np.float32(g.solve['xtotal']),g.solve['xpixels'],pathToCSV,psi)
         print("Finished making data")
-        print(np.shape(intensity))
-        plot(intensity, name = g.solve['name'])
+        if len(intensity)!=0:
+            plot(intensity, name = g.solve['name'])
 
 
 
@@ -195,7 +196,9 @@ if __name__ == "__main__":
     COL-=2
     ROW+=1
     guinum('par7', 'Super Gaussian Width Scaling', root, ROW, COL)
-
+    COL+=2
+    guinum('par8', 'Noise', root, ROW, COL)
+    COL-=2
 
     
     ROW+=2

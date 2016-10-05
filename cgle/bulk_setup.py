@@ -27,15 +27,16 @@ def params_for_multi(subfolder):
     timestep = 0.01
     numtimesteps = 10000.
     tpixels = 800
-    deltaList = np.linspace(-0.12,-0.08,num=5)
-    betaList = np.linspace(0.,0.5,num=3)
-    DList = [1]#[-1,1]
-    epsilonList = np.linspace(0.,1.5,num=4)
-    muList = np.linspace(-0.1,-0.5,num=5)
-    nuList = np.linspace(-0.05,-0.15,num=3)
+    deltaList = np.linspace(-0.5,0.1,num=5)
+    betaList = np.linspace(0.,0.2,num=4)
+    DList = [-1.,1.]#np.linspace(-1.5,1.5,num=7)
+    epsilonList = np.linspace(0.5,1.,num=4)
+    muList = np.linspace(-0.13,-0.07,num=5)
+    nuList = np.linspace(-0.05,-0.11,num=5)
     RealLength = 40.
     xpixels = 800
-    oldstate = [2*np.exp(-x**2/9) for x in np.arange(-RealLength/2.,RealLength/2.,0.01)]
+    xres = 0.01
+    oldstate = [2*np.exp(-x**2/9) for x in np.arange(-RealLength/2.,RealLength/2.,xres)]
 
     allparams = list([[next(identity), timestep,numtimesteps, tpixels,delta,beta,D,epsilon,mu,nu,RealLength,xpixels,pathToSubfolder,oldstate]
              for delta in deltaList   for beta in betaList   for D in DList   for epsilon in epsilonList   for mu in muList   for nu in nuList])

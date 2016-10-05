@@ -44,6 +44,41 @@ def linear(current_state,fourier_state,LinList,pm,fft_object,ifft_object):
         np.multiply(current_state,pm,current_state)
 
 
+def periodicDist(x,mu,L):
+        if x<mu-L*0.5:
+                return abs(L-mu+x)
+        elif x>mu+L*0.5:
+            return abs(mu+L-x)
+        else:
+            return abs(mu-x)
+
+def baddata(state):
+        absol = np.abs(state)
+        maximum = np.max(absol)
+        total = np.sum(absol)
+
+        
+        if np.sum(np.isnan(absol))>0:
+                print("Nan")
+                return False
+        elif maximum>10**5:
+                print("Too Big")
+                return False
+        elif total<1:
+                print("Too Small")
+                return False
+        
+        L=len(absol)
+        xlist = range(L)
+        probdist = [height/total for x,height in zip(xlist,absol)]
+        average = np.sum([x*p for x,p in zip(xlist,probdist)])
+        nearmean = np.sum([h for h,x in zip(absol,xlist) if periodicDist(x,average,L)<L/4])
+        if nearmean/total<0.65:
+                print("Too Spread Out")
+                return False
+        else:
+                return True
+        
 
 def newgenerator(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,pathToCSV,initial_state): #This finds the fastest FFT method once, and uses this many times.
         #It is currently LNL. To make it go NLN, change LinList, ctime, dtime, and make the loops work this way.
@@ -73,6 +108,22 @@ def newgenerator(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,pathTo
         cterm = pyfftw.empty_aligned(xSteps, dtype='complex128')
         dterm = pyfftw.empty_aligned(xSteps, dtype='complex128')
         tempterm = pyfftw.empty_aligned(xSteps, dtype='complex128')
+        
+
+
+        #This runs the simulation for a fixed number of times
+        if 1:
+            for j in range(6):
+                for i in range(int(numtimesteps/2)):
+                        nonlinear(ctime,dtime,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm,tempterm)
+                        linear(current_state,fourier_state,LinList,pm,fft_object,ifft_object)
+                        nonlinear(ctime,dtime,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm,tempterm)
+                if not baddata(current_state):
+                        return
+                        yield
+                        
+
+
 
         if len(current_state)>xpixels:
                 xyieldnum = int(round(len(current_state)*1./xpixels))
