@@ -112,10 +112,13 @@ def plot(intensity, title="", name='a'):
         plt.close()
         plt.cla()
         plt.clf()
-        dx = float(g.solve['xtotal'])/len(small_intensity[0])
-        tpix = int(round(len(small_intensity)/200.))#This allows us to only plot ~200 points
-                
-        temparr = np.array([data for i,data in enumerate(small_intensity) if i%tpix==0])
+        
+        #tpix = int(round(len(small_intensity)/200.))#This allows us to only plot ~200 points
+        
+        temparr = small_intensity #np.array([data for i,data in enumerate(small_intensity) if i%tpix==0])
+
+        dx = float(g.solve['xtotal'])/len(temparr[0])
+        
         np.multiply(temparr,temparr,temparr)
         ylist = np.sum(temparr,axis=1)*dx        
         xlist = range(len(ylist))

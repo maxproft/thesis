@@ -5,17 +5,17 @@ from PIL import Image
 import pythonCGLE as cgle
 import os,sys
 import pickle
-
+import peakutils
 
 
 ########   Test if a list is not a soliton, has Nan, etc.    ##################
-def periodicDist(x,mu,L):
-        if x<mu-L*0.5:
-                return abs(L-mu+x)
-        elif x>mu+L*0.5:
-            return abs(mu+L-x)
+def periodicDist(x,centre,L):
+        if x<centre-L*0.5:
+                return abs(L-centre+x)
+        elif x>centre+L*0.5:
+            return abs(centre+L-x)
         else:
-            return abs(mu-x)
+            return abs(centre-x)
 
 def baddata(state):
         absol = np.abs(state)
@@ -44,9 +44,27 @@ def std(data,xlength):
         prob = np.abs(data)/np.sum(np.abs(data))
         L=len(data)
         xlist = range(L)
-        mean = np.sum([x*p for x,p in zip(xlist,prob)])
+        centre = np.argmax(prob)
+        mean = np.sum([periodicDist(x,centre,L)*p for x,p in zip(xlist,prob)])
         std = np.sqrt(np.sum(  [p*periodicDist(x,mean,L)**2 for x,p in zip(xlist,prob)]))
         return std*xlength/L
+
+######    find the period     ############
+def TimeFreq(energies, T):
+        maximum = max(energies)
+        minimum = min(energies)
+
+        amp = (maximum-minimum)/2.
+        const = (maximum+minimum)/2.
+        t = np.array(range(len(energies)))
+
+        indexes = peakutils.indexes(np.array(energies),thres=amp/20., min_dist = 10)
+        if len(indexes)>1:
+                peak_dist = np.average(np.diff(indexes))
+                freq = 1.*len(energies)/(peak_dist*T)
+        else:
+                freq=0.
+        return freq
 
 
 
@@ -93,13 +111,14 @@ def MakeData(inlist):
         q = np.sum(absol*absol,axis=1)*RealLength/len(absol[0])
         qDiff = max(q)-min(q)
 
-        stdlist = [std(data) for data in outarr]
+        stdlist = [std(data,RealLength) for data in outarr]
         maxstd = max(stdlist)
         minstd = min(stdlist)
         stdDiff = maxstd-minstd
+
+        freq = TimeFreq(q,numtimesteps*timestep)
         
-        np.savetxt(pathToExtra, np.array([HeightDiff,qDiff,maxstd,stdDiff]),delimiter=",")
-        
+        np.savetxt(pathToExtra, np.array([HeightDiff,qDiff,maxstd,stdDiff,freq]),delimiter=",")
         
         BWImage(np.abs(outarr),pathToPNG)
         
