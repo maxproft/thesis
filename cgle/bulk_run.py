@@ -60,7 +60,7 @@ def TimeFreq(energies, T):
         const = (maximum+minimum)/2.
         t = np.array(range(len(energies)))
 
-        indexes = peakutils.indexes(np.array(energies),thres=amp/10., min_dist = 10)
+        indexes = peakutils.indexes(np.array(energies),thres=amp/20., min_dist = 10)
         if len(indexes)>1:
                 peak_dist = np.average(np.diff(indexes))
                 freq = 1.*len(energies)/(peak_dist*T)
@@ -125,10 +125,10 @@ def MakeData(inlist):
         stdDiff = maxstd-minstd
         
         #Frequency
-        if qDiff/max(q)<10**-2:
-                freq = 0.
-        else:
+        if qDiff/min(q)>0.01 or stdDiff/minstd>0.01:
                 freq= TimeFreq(q,numtimesteps*timestep)
+        else:
+                freq = 0.
         
         np.savetxt(pathToExtra, np.array([HeightDiff,qDiff,maxstd,stdDiff,freq]),delimiter=",")
         

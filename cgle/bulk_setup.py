@@ -25,14 +25,22 @@ def params_for_multi(subfolder):
 
     identity = IdGen()
     timestep = 0.01
-    numtimesteps = 5000.
+    numtimesteps = 5000.*0.5
     tpixels = 800
-    deltaList =(-0.5,0.1) #np.linspace(-0.5,0.1,num=5)
-    betaList = (0.,0.2)#np.linspace(0.,0.2,num=4)
-    DList = (-1.5,1.5)#np.linspace(-1.5,1.5,num=7)
-    epsilonList = (0.5,1.) #np.linspace(0.5,1.,num=4)
-    muList = (-0.13,-0.07)#np.linspace(-0.13,-0.07,num=5)
-    nuList = (-0.05,-0.11)#np.linspace(-0.05,-0.11,num=5)
+    if 1:
+        deltaList =(-0.5,0.1)
+        betaList = (0.,0.2)
+        DList = (-1.5,1.5)
+        epsilonList = (0.5,1.)
+        muList = (-0.13,-0.07)
+        nuList = (-0.05,-0.11)
+    if 0:
+        deltaList =(-0.1,-0.1) 
+        betaList = (0.08,0.08)
+        DList = (1,1)
+        epsilonList = (0.6,0.7) 
+        muList = (-0.1,-0.1)
+        nuList = (-0.09,-0.05)
     RealLength = 40.
     xpixels = 800
     xres = 0.01
@@ -43,7 +51,7 @@ def params_for_multi(subfolder):
         return float(np.random.uniform(a,b))
 
     
-    numsimulations = 64*1200
+    numsimulations = 8*10
     allparams = list([[next(identity), timestep,numtimesteps, tpixels,
                   uni(deltaList),uni(betaList),uni(DList),uni(epsilonList),uni(muList),uni(nuList),
                   RealLength,xpixels,pathToSubfolder,oldstate] for i in range(numsimulations)])
