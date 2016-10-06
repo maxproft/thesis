@@ -47,7 +47,7 @@ def std(data,xlength,distlist):
         L=len(data)
         xlist = range(L)
         centre = np.argmax(prob)
-        mean = np.dot(distlist,prob)
+        mean = np.dot(distlist,prob)+centre
         std = np.sqrt(np.dot(prob,distlist**2))
         return std*xlength/L
 

@@ -25,7 +25,7 @@ def params_for_multi(subfolder):
 
     identity = IdGen()
     timestep = 0.01
-    numtimesteps = 5000.*0.5
+    numtimesteps = 5000.
     tpixels = 800
     if 1:
         deltaList =(-0.5,0.1)
@@ -35,6 +35,7 @@ def params_for_multi(subfolder):
         muList = (-0.13,-0.07)
         nuList = (-0.05,-0.11)
     if 0:
+        numtimesteps=2500
         deltaList =(-0.1,-0.1) 
         betaList = (0.08,0.08)
         DList = (1,1)
@@ -51,7 +52,7 @@ def params_for_multi(subfolder):
         return float(np.random.uniform(a,b))
 
     
-    numsimulations = 8*10
+    numsimulations = 64*1000#6 hours
     allparams = list([[next(identity), timestep,numtimesteps, tpixels,
                   uni(deltaList),uni(betaList),uni(DList),uni(epsilonList),uni(muList),uni(nuList),
                   RealLength,xpixels,pathToSubfolder,oldstate] for i in range(numsimulations)])

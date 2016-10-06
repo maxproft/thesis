@@ -1,19 +1,16 @@
 import numpy as np
 import bulk_run as b
-
-
-
-#a = [np.sin(2.*np.pi*t*12) for t in np.linspace(0,0.5,2000)]
-a = [12 for t in np.linspace(0,0.5,2000)]
-
-freq = b.TimeFreq(a,0.5)
-print(freq)
-pred = [np.sin(2*np.pi*freq*t) for t in np.linspace(0,0.5,2000)]
-
-
 import matplotlib.pyplot as plt
 
-plt.plot(pred, 'r-')
-plt.plot(a,'b.')
 
+a = [(x-1.)**2 for x in np.linspace(0,2,100)]
+a = [-(x-1.5)**2+2 for x in np.linspace(0,2,100)]
+a = np.abs(a)
+centre = np.argmax(a)
+distlist = np.array([b.periodicDist(x,centre,len(a)) for x in range(len(a))])
+c = b.std(a, 2., distlist)
+
+
+
+plt.plot(a)
 plt.show()
