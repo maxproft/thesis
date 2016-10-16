@@ -1,26 +1,29 @@
 %% Initialization
-clear ; close all; clc
+#clear ; close all; clc
 
 %Load the data and separate it into the input and output.
-rawdata = load("data.csv");
-inData = rawdata(1:end,1:end-1);
-yReal = rawdata(1:end,end);
+fprintf('Program Starting Now\n');
+rawdata = load("maxSD machLearnData.csv");
+inData = rawdata(1:end,1:end-1);#The first 6 columns
+yReal = rawdata(1:end,end);#This is the last column
 
+clear rawdata
 
-
+fprintf('Making Poly Features\n');
 
 %Make all polynomial terms here
 polyInput = polyFeatures(inData);
+clear in Data
 
+#polyFeatures(ones(10,1)*[2,3,5]) %This is to test whether or not the polyFeatures function works
 
-%polyFeatures(ones(10,1)*[2,3,5]) %This is to test whether or not the polyFeatures function works
-
-
+fprintf('Normalising the data\n');
 %Regularising input:
 [regPoly,regMean,regSD] = regularization(polyInput);
 
+clear polyInput
 
-
+fprintf('Training the algorithm\n');
 
 %Train to get theta
 options = optimset('GradObj', 'on', 'MaxIter', 400);

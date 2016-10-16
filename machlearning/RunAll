@@ -1,0 +1,5 @@
+#!/bin/bash
+
+octave linreg.m
+python percentCorrect.py
+python pypoly.py

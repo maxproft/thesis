@@ -8,6 +8,7 @@
 \usepackage{mathtools}
 \usepackage{ifthen}
 \usepackage{mathrsfs}
+\usepackage{setspace}
 
 \oddsidemargin 0.1in		% Left margin is 1in + this value
 \textwidth 5.75in		% Right margin is not set explicitly
@@ -20,8 +21,9 @@
 \iffalse
 These words need to be added to the dictionary:
 Ginzburg, soliton, Runge, Kutta, CGLE, Fourier, Landau
-discretise
-Decide whether to use non linear, non-linear, nonlinear
+discretise nonlinear
+
+I will use nonlinear (not non linear or non-linear)
 \fi
 
 
@@ -54,8 +56,8 @@ Citation numbers
 \centering
 {\ \\ }
 \vspace{3cm}
-{\bf  \fontsize{1.35cm}{2.5cm}\selectfont Soliton Solutions of the \vspace{0.5cm} Complex Ginzburg \\\vspace{0.5cm}Landau Equation}\\
-\vspace{2cm}
+{\bf  \fontsize{1.35cm}{2.5cm}\selectfont \vspace{0.5cm} Classifying Solutions\vspace{0.5cm} of \vspace{0.5cm} the Complex Ginzburg \vspace{0.5cm}Landau Equation with Machine Learning\vspace{0.5cm}}\\
+%\vspace{2cm} \\
 {\Huge By Max Proft}\\
 {\Huge u5190335}
 \end{titlepage}
@@ -87,127 +89,135 @@ Subsubsection (not shown in contents)
 
 
 
-
+\onehalfspacing
 
 
 \unnum{chapter}{Abstract}
-Abstract goes here.
+Make this half a page \\\\
+Produced a program to generate solitons.
+The energy difference, frequency, height difference and width were recorded for a large number of parameters (30,000 different values) and an attempt was made to be able to use machine learning to predict these. The reason we want to do this is because typically classifying regions is done by hand, and so it is difficult to see the boundary of one region of solitons (e.g. exploding) is. This was unsuccessful. 
+
 
 \unnum{chapter}{Acknowledgements}
 Chuck in some very cliché acknowledgements here.
+Thanks Nail and Adrian for helping me, etc. 
 
+\unnum{chapter}{List of Figures}
 
-
-
+\unnum{chapter}{What to add}
+Non uniqueness of solitons - Creeping vs oscillating. I think I have examples of oscillating an non oscillating.
+\\\\
+Do I want equation numbers?
 
 
 
 
 \chapter{Introduction to the CGLE}
-The Complex Ginzburg Landau equation (CGLE) is a differential equation that describes a range of quantum phenomena, such as ----------------. 
-It is typically written in the following form:
+%The purpose of this chapter is to introduce the equation, explain what all the terms represent, and 
+The Complex Ginzburg Landau equation (CGLE) is a differential equation that is typically written in the following form, but also it is often written without the quintic terms ($|\psi|^4\psi$): 
 $$i\psi_t +\frac{D}{2}\psi_{xx}+|\psi|^2\psi +\nu |\psi|^4\psi = i\delta \psi+i\epsilon|\psi|^2\psi +i\beta\psi_{xx}+i\mu|\psi|^4\psi$$
 $\psi$ refers to the normalised field (normalised with respect to what?)\\
 $D = \pm 1$. if $D=1$ then normal. This means that as the optical frequency increases, the group velocity decreases. If $D=-1$ then the group velocity dispersion is anomalous, which is the opposite.\\
 $\beta>0$ is parabolic gain and $\beta<0$ effectively means that sharp spikes are filtered out. (This doesn't make sense - shouldn't it be the other way around?)
  causes spectral filtering\\
 $\delta$ is the linear gain/loss depending on whether it is positive/negative. \\
-$\epsilon$ is nonlinear gain which can arise for a variety of reasons, such as saturable absorption (absorbtion decreases/reflectivity increases as intensity increases.)\\
+$\epsilon$ is nonlinear gain which can arise for a variety of reasons, such as saturable absorption (absorption decreases/reflectivity increases as intensity increases.)\\
 $\mu$ and $\nu$, when negative, represents the saturation of the NL gain and NL refractive index respectively. 
-
-
-
-
-
-
-
-\chapter{Derivations of the CGLE}
-\section{For a Quantum System}
-\section{For a Classical System}
-
-
-
-
-
-
-
-
-
-
-
-
-\chapter{Types of solitons}
-There are many types of solitons, however an explicit expression for the function usually cannot be found. 
-
-While many explicit solutions for the schrodinger equation have been found, with additional nonlinearity means that finding explicit solutions to the CGLE is often not possible.
 \\\\
-(Jia-Min Zhu and Zheng-Yi Ma (2007),Pierre Hillion (2012), Mihalache and Panoiu (1992), Yan-Ze Peng and Krishnan (2007) =  Schrodinger equation)
+This equation describes the evolution of a number of systems, from quantum systems like fibre optic propegation in mode locked lasers, superconductivity, superfluidity, as well as classical systems like Bernard Reyleigh convection.
+It is an amplitude equation, which means that the quantity we are modelling (e.g. temperature) is given by the amplitude of $\psi$, albeit with scaling. 
+
+
+
+\section{Applications and pseudo-derivation}
+The CGLE describes a wide range of phenomena. Upon setting various components to zero, we get can derive a number of equations in fluid dynamics, such as the diffusion equation, as well as the nonlinear Schr\"odinger equation. 
+On top of this, Aranson and Kramer (world of CGLE) give a method to transform a general set of hydrodynamic equations to the CGLE. This hydrodynamic equation is given as:
+$$\tau (\partial_{\tilde t}\tilde A-\tilde v_g\cdot \tilde\nabla \tilde A)=\epsilon(1+ia)\tilde A+\xi^2+(1+ib)\tilde\nabla^2 \tilde A-g(1+ic)|\tilde A|^2 \tilde A$$ 
+Aranson amd Kramer tell us that we can rescale the axes in order to get the CGLE back. 
+$$\tilde A=(\epsilon/g)^{1/2} A \ exp[-i (\epsilon a/\tau)\tilde t], \ \ \tilde t = (\tau/\epsilon)t, \ \ \vec {\tilde x} = (\xi/\epsilon^{1/2})\vec x+\vec v_g \tilde t$$
+This substitution yields the cubic CGLE in the following form:
+$$\partial_t A=A+(1+ib)\nabla^2A-(1+ic)|A|^2A$$
+
+
+Rayleigh-Benard convection:
+step 1: it obays the swift hohenberg equation. \\
+step 2: if the convection cells are symmetric, then it needs to be invariant under $x\rightarrow -x$  and so the simplest nonlinearities we can have are $x^3$ and $x^5$. We can also then assume that the field satisfies $U=F[z] e^{\sigma t+iqx}+cc$, where sigma is the growth rate, q wavenumber, cc is the complex conjugate. 
+step 3: subbing this into the swift hohenberg equation, and assuming nonlinearities are small, the growth rate is given by $\sigma = \epsilon -D(q_c^2-q^2)^2$
+step 4: make assumptions such as $q\approx q_c$ for small $\epsilon$ and expand and simplify for the amplitude equation which gives the CGLE.
 \\\\
-We can classify solitons depending on their behaviour.
-Stationary solitons maintain a constant amplitude.
-Pulsating solitons are another type, and can be categorised into subsets such as "plain pulsating",  "exploding" and creeping. \\\\
-Plain pulsating solitons are periodic and don't exhibit any significant features, as given in figure \ref{plain}.
-\begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{plain}
-\caption{The 2D plot of a plain pulsating soliton with parameters ..........}
-\label{plain} 
-\end{figure}
-Exploding solitons are characterised by a sharp jumps in their energy profile, as given in figure \ref{expl_profile}, with the 2D intensity given in figure \ref{expl}. Other solitons will, instead of exploding outwards, give a high intensity spike, as in figure \ref{highamp} whose energy increases by >10 times because of the spike
-\begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{expl_profile}
-\caption{The profile of an exploding soliton with parameters ..........}
-\label{expl_profile} 
-\end{figure}
-\begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{expl}
-\caption{The 2D intensity of an exploding soliton with parameters ..........}
-\label{expl} 
-\end{figure}
-\begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{highamp}
-\caption{The 2D intensity of a high amplitude soliton with parameters ..........}
-\label{highamp} 
-\end{figure}
-As parameters are varying, unusual behaviour can also be seen. 
-For example, with the set of parameters (---------), when varying $\epsilon$, periodic doubling can be seen, as in figure \ref{periodic_doubling}. As the parameter c is increased, the the height of the solitons changes to a period 2 then a period 4 cycle. 
-\begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{periodic_doubling}
-\caption{The energy profile of 3 solitons, with periodic doubling being seen. Parameters .........., for these images, the actual domain is from 0 to 100.}
-\label{highamp} 
-\end{figure}
-
-We also get solitons that creep sideways as they oscillate.
-An example is given in figure ------- of a soliton that creeps to the right forever. Another example is in figure \ref{periodpulse} 
-\begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{periodpulse}
-\caption{A creeping, pulseating soliton that is also periodic. Note that the weird patterning inside the image is from aliasing. params ---------}
-\label{periodpulse} 
-\end{figure}
-
+If we want a general differental equation of a complex parameter which is invariant under multiplication by a phase shift $e^{i\phi}$, then we have limited choices of parameters.
+Any derivative is fine.You can get rid of first order derivatives in x by rescaling the parameter $x$. and if we assume that diffusion is dominant, we can ignore higher order derivatives. 
+\\\\
+Additional terms could be approximated with elements from $\{A,A^*, A^*A, AA^*A,A^*AA^* ...\}$, and so to be able to satisfy the invariance under phase shift, we would expect terms of the form $|\psi|^{2n}\psi$ for some positive integer n. 
+\\\\
+superconductivity has energy given by $F=F_n +\alpha |\psi|^2+\frac{\beta}{2}|\psi|^4 +\frac{1}{2m}|(-i\hbar\nabla -2eA)\psi|^2+\frac{|B|^2}{2\mu_0}$, where $B=\nabla \times A$ is the magnetic field and vector potential. This is the energy when near a superconducting transition If there is no magnetic field.
+\\\\
+We then say that the evolution equation is given by:Lyapunov functional http://pauli.uni-muenster.de/tp/fileadmin/lehre/NumMethoden/SoSe10/Skript/GLE.pdf
+$$\partial_t \psi = -\frac{\delta F}{\delta A^*} F $$
+Invariance under a phase shift, and invariant under a reflection.
+superfluidity,
+and Bose-Einstein condensation to liquid crystals
+\\\\
+THIS IS COPPIED FROM TWOTCGLE, but explains to me why it is so common.
+It provides a reduced, universal description of
+weakly nonlinear spatio-temporal phenomena in ex-
+tended (in x  ) continuous media whose linear dispersion
+is of a very general type (see below) and that are invari-
+ant under a global change of gauge [multiplication of A
+by $exp(i\phi)]$. This symmetry typically arises when A is
+the (slowly varying) amplitude of a phenomenon that is
+periodic in at least one variable (space and/or time) as a
+consequence of translational invariance of the system.
+END COPY
+\\\\
+On the first page of TWOTCGLE, he gives an example hydrodynamic equation. We see the convection-diffusion equation in part of this. Also the navier stokes is hidden in here as well. Double diffusive convection, Rayleigh Benard convection
+\\\\
+COPIED:
+he CGLE may also be viewed as a dissipative exten
+sion of the conservative nonlinear Schrodinger equation,
+END COPIED
+\\\\
+Thngs to llok at:
+There is an extensive mathematical literature on the
+CGLE, which we shall only touch upon; see, for ex-
+ample, Doering et al. (1987, 1988); van Harten (1991);
+Schneider (1994); Doelman (1995); Mielke and
+Schneider (1996); Levermore and Stark (1997); Mel-
+bourne (1998); Mielke (1998).
+\\\\
+Sinks and sources
+\\\\
+I should also add in something about fibre optic propegation as well, as a lot of the papers i use reference this.
+\\\\
+I don't think my sequence is right. Instead the taylor series should give the terms $\{A^n {A^*} ^m\}$, but we still get rid of the terms that don't satisfy the desired properties.
+\\\\
+Put in a picture to explain rayleigh-bernard convection, 
 
 
 \chapter{Mathematical Theory Behind Solving the CGLE}
-\section{A Comparison of Different Methods}
+
+\section{A Brief look at Different Methods to solve the CGLE}
 
 A finite difference method was used initially to get it all going. This is bad because you do $\delta \psi / \delta x$, so over a small time period, the $\delta \psi$ term can lose several digits of precision, not good. There are a number of other ways for this to be solved though. 
 \\\\ 
 For the nonlinear schrodinger equation, (Taha and Ablowitz) compared various methods for solving this. While under certain conditions, some other methods were found to be better than the split step fourier method, overall it was found to be a faster algortihm. Given that the CGLE is an extension of the NLSE, this means that this should also be a reasonably good method to do this part as well. This has previously been done by other authors as well, (Wang, Zhang).
 
 \section{Split Step Fourier and Runge-Kutta Method}
+Note that in the following section, we are instead going to treat the CGLE as being the following equation which we break into linear and nonlinear parts:
+$$\frac{d\psi}{dt} = A \frac{d^2\psi}{dx^2} + B\psi + C |\psi|^2\psi + D|\psi|^2\psi = \hat L \psi + \hat N \psi$$
+where the linear component is:
+$$\hat L \psi = A \frac{d^2\psi}{dx^2} + B\psi$$
+and the nonlinear component is:
+$$\hat N \psi = C |\psi|^2\psi + D|\psi|^2\psi$$
+
 \subsection{Linear evolution (Fourier)}
 Here we are solving the equation: 
 $$\frac{d\psi}{dt}=A\frac{d^2\psi}{dx^2}+B\psi$$
 Defining the fourier transform by: 
 $$\hat \psi(f)=\int\limits_{-\infty}^\infty \psi(x)e^{-i2\pi x f} dx$$
 By taking the fourier transform of both sides, the equation becomes:\\
-$$\frac{d \hat \psi}{dt}= C(-2\pi i f)^2 D\hat \psi (f)+\hat \psi(f)= (C-D4 \pi^2 f^2) \hat \psi(f)$$
-$$\implies \hat \psi_t(f) = e^{(C-D4\pi^2 f^2)t}\hat \psi_0(f)$$
+$$\frac{d \hat \psi}{dt}= (-2\pi i f)^2 A \ \hat \psi (f)+B\ \hat \psi(f)= (B-A \ 4 \pi^2 f^2) \hat \psi(f)$$
+$$\implies \hat \psi_t(f) = e^{(B-A \ 4\pi^2 f^2)t}\hat \psi_0(f)$$
 And so upon inverse fourier transforming, we get the solution to this DE, where $\hat \psi_t(f)$ is the fourier transform at time $t$.
 The Fourier transform can be done numerically with a discrete fourier transform, as described in a later subsection.
 
@@ -324,13 +334,81 @@ Additionally, as previously done, there are a number of papers which give intere
 
 
 
+\chapter{Types of solitons}
+You need to wait for the transient response to go away, and keep the rest (only interested in the long term behaviour)
+\\\\
+There are many types of solitons, however an explicit expression for the function usually cannot be found. 
+
+While many explicit solutions for the schrodinger equation have been found, with additional nonlinearity means that finding explicit solutions to the CGLE is often not possible.
+\\\\
+(Jia-Min Zhu and Zheng-Yi Ma (2007),Pierre Hillion (2012), Mihalache and Panoiu (1992), Yan-Ze Peng and Krishnan (2007) =  Schrodinger equation)
+\\\\
+We can classify solitons depending on their behaviour.
+Stationary solitons maintain a constant amplitude.
+Pulsating solitons are another type, and can be categorised into subsets such as "plain pulsating",  "exploding" and creeping. \\\\
+Plain pulsating solitons are periodic and don't exhibit any significant features, as given in figure \ref{plain}.
+\begin{figure}[h]
+\centering
+\includegraphics[width=2.6in]{plain}
+\caption{The 2D plot of a plain pulsating soliton with parameters ..........}
+\label{plain} 
+\end{figure}
+Exploding solitons are characterised by a sharp jumps in their energy profile, as given in figure \ref{expl_profile}, with the 2D intensity given in figure \ref{expl}. Other solitons will, instead of exploding outwards, give a high intensity spike, as in figure \ref{highamp} whose energy increases by >10 times because of the spike
+\begin{figure}[h]
+\centering
+\includegraphics[width=2.6in]{expl_profile}
+\caption{The profile of an exploding soliton with parameters ..........}
+\label{expl_profile} 
+\end{figure}
+\begin{figure}[h]
+\centering
+\includegraphics[width=2.6in]{expl}
+\caption{The 2D intensity of an exploding soliton with parameters ..........}
+\label{expl} 
+\end{figure}
+\begin{figure}[h]
+\centering
+\includegraphics[width=2.6in]{highamp}
+\caption{The 2D intensity of a high amplitude soliton with parameters ..........}
+\label{highamp} 
+\end{figure}
+As parameters are varying, unusual behaviour can also be seen. 
+For example, with the set of parameters (---------), when varying $\epsilon$, periodic doubling can be seen, as in figure \ref{periodic_doubling}. As the parameter c is increased, the the height of the solitons changes to a period 2 then a period 4 cycle. 
+\begin{figure}[h]
+\centering
+\includegraphics[width=2.6in]{periodic_doubling}
+\caption{The energy profile of 3 solitons, with periodic doubling being seen. Parameters .........., for these images, the actual domain is from 0 to 100.}
+\label{highamp} 
+\end{figure}
+
+We also get solitons that creep sideways as they oscillate.
+An example is given in figure ------- of a soliton that creeps to the right forever. Another example is in figure \ref{periodpulse} 
+\begin{figure}[h]
+\centering
+\includegraphics[width=2.6in]{periodpulse}
+\caption{A creeping, pulseating soliton that is also periodic. Note that the weird patterning inside the image is from aliasing. params ---------}
+\label{periodpulse} 
+\end{figure}
+
+
+\section{Previous things done to classify solitons in to regions}
+The issue we have at the moment is that there are 6 parameters, and if we take 100 data points over a given range, we would need to calculate $10^12$ parameters. In addition, many parameters are given with high precision, and if we were to replicate this (high amplitude pulse), we would need many, many more points to plot. Given that each simulation takes a while with high precision, it is not an easy task to classify different regions, and typically has been done by hand and/or over a small region of space.
+\\\\
+Regions plotted are, for example, where exploding solitons occur, we get bifurcations in peak height. 
+
+
+
+
+
+
+
 
 
 \chapter{Machine Learning Theory}
 \section{Different Types of Machine Learning}
-I want to enter in an image, and get it to tell me if it is oscillating/etc.\\
-I want another machine learning algorithm to predict the required precision, and wait time before recording the output.\\
-Monte Carlo and gradient descent to find new solns.\\
+Very quickly summarise the MOOC.\\
+I just need linear regression.
+
 \section{Linear Regression}
 Former Title: Different Options for the Machine Learning Algorithm\\
 Another Title Removed: A detailed look at neural networks\\
@@ -372,21 +450,24 @@ My algorithm went up to 4th order polynomial terms, and with 6 different paramet
 
 
 
-
-
-
-
-
-
 \chapter{The result from much work}
-\section{The sorts of things that I found}
+\section{The sorts of things that I was looking for}
+I now want to say something about what data I tested.\\
+I took random parameters between (range) for all $\beta, \delta, D, \epsilon, \mu, \nu$\\
+I ran the program for 350 time units with step size of 0.01. xrange = 40 with stepsize 0.01. Only the last 50 time units was kept so that it has time to stabilise into a stable soliton. 
+\\\\
+looking only at the last 50 time units to get this info.
+Data recorded for each simulation: frequency of oscillation, max energy-min energy,  difference between max and min standard deviation, and height difference. Height difference is the maximum height minus the minimum height in that same column(i.e. if the maximum occurs in column 50, then we look for the minimum value in column 50)
+\\\\
+The freq is calculated by finding peaks in the energy profile, and taking the average distance between these peaks to be the period. Again, this is not neccessarily a constant, for example IMAGE.
+\\\\
+Once I have predicted things, plot the number within 5\% of the true value (and then 10\%, etc.). Keep in mind that I don't want all points matching well. For example, THIS IMAGE has multiple solitons being propagated forwards in time in parallel. This won't affect some things like period much, but it will effect the standard deviation. 
+\\\\
+\section{What was the accuracy?}
+Plot the \% that was within $x$ from the true value (e.g. what percentage of the predicted frequency is within 5\%,10\%,15\% of the true value )
 
-
-
-
-
-
-
+\section{Plots of regions}
+Once this has been trained, plot the data for various regions, and compare with other other region plots that we have. (e.g. exploding vs normal solitons)
 
 
 

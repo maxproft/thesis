@@ -8,10 +8,10 @@ newtheta=theta;
 newtheta(1)=0;
 
 
-J=sum((X*theta'-y).^2)/(2*m)        + sum(newtheta.^2)*lambda/(2*m);
+J=sum((X*theta'-y).^2)/(2*m)    ;#    + sum(newtheta.^2)*lambda/(2*m);
 
 
-grad = sum(  ((X*theta'-y)*ones(1,size(theta,2))  )  .*X)/m        + newtheta*lambda/m;
+grad = sum(  ((X*theta'-y)*ones(1,size(theta,2))  )  .*X)/m     ; #  + newtheta*lambda/m;
 
 
 

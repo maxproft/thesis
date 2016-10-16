@@ -1,4 +1,4 @@
-tRange 50*0.5 by accident (SO 25), done 4 times, then return the 5th.
+tRange 50, done 4 times, then return the 5th.
 Xwidth - 40
 tstep = 0.01
 xstep = 0.01

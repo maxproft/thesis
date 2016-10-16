@@ -1,4 +1,4 @@
-tRange 50, done 4 times, then return the 5th.
+tRange 50, done 6 times, then return the 7th. (total time is 350)
 Xwidth - 40
 tstep = 0.01
 xstep = 0.01
