@@ -112,7 +112,7 @@ def newgenerator(timestep,numtimesteps,tpixels,A,B,C,D,RealLength,xpixels,pathTo
 
 
         #This runs the simulation for a fixed number of times
-        if 1:
+        if 0:
             for j in range(8):
                 for i in range(int(numtimesteps/2)):
                         nonlinear(ctime,dtime,current_state,k1,k2,k3,k4,ksum,absol,cterm,dterm,tempterm)

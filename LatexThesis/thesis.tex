@@ -10,30 +10,23 @@
 \usepackage{mathrsfs}
 \usepackage{setspace}
 
-\oddsidemargin 0.1in		% Left margin is 1in + this value
-\textwidth 5.75in		% Right margin is not set explicitly
-\topmargin 0in			% Top margin is 1in + this value
-\textheight 8.5in			% Bottom margin is not set explicitly
+\oddsidemargin 0.6in		% Left margin is 1in + this value
+\textwidth 5.in		% Right margin is not set explicitly
+\topmargin 0.25in			% Top margin is 1in + this value
+\textheight 8.in			% Bottom margin is not set explicitly
 %\setlength{\columnsep}{2cm}
 
 
 
 \iffalse
 These words need to be added to the dictionary:
-Ginzburg, soliton, Runge, Kutta, CGLE, Fourier, Landau
-discretise nonlinear
-
+Ginzburg, soliton, Runge, Kutta, CGLE, Fourier, Landau nonlinearity
+discretise nonlinear, NLSE, solitons, Coursera
+Benard superfluidity saturable nonlinearities
+Schrodinger Hohenberg Hausdorff Mathematica Nyquist
+SVM overfitting sech Akhmediev Ankiewicz
+Schodinger pseudospectral
 I will use nonlinear (not non linear or non-linear)
-\fi
-
-
-\iffalse
-\begin{figure}[h]
-\centering
-\includegraphics[width=4.6in]{correlation}
-\caption{A ploperature.}
-\label{corr} 
-\end{figure}
 \fi
 
 
@@ -44,6 +37,7 @@ Contents Page
 Image reference numbers
 Table reference numbers
 Citation numbers
+make sure bibliography is on contents page (once)
 \fi
 
 
@@ -56,7 +50,7 @@ Citation numbers
 \centering
 {\ \\ }
 \vspace{3cm}
-{\bf  \fontsize{1.35cm}{2.5cm}\selectfont \vspace{0.5cm} Classifying Solutions\vspace{0.5cm} of \vspace{0.5cm} the Complex Ginzburg \vspace{0.5cm}Landau Equation with Machine Learning\vspace{0.5cm}}\\
+{\bf  \fontsize{1.35cm}{2.5cm}\selectfont \vspace{0.5cm} Using Machine\vspace{0.5cm} Learning to \vspace{0.5cm}Predict Properties\vspace{0.5cm} of Soliton Solutions of\vspace{0.5cm} the Complex \vspace{0.5cm}Ginzburg Landau Equation\vspace{0.5cm}}\\
 %\vspace{2cm} \\
 {\Huge By Max Proft}\\
 {\Huge u5190335}
@@ -93,410 +87,561 @@ Subsubsection (not shown in contents)
 
 
 \unnum{chapter}{Abstract}
-Make this half a page \\\\
-Produced a program to generate solitons.
-The energy difference, frequency, height difference and width were recorded for a large number of parameters (30,000 different values) and an attempt was made to be able to use machine learning to predict these. The reason we want to do this is because typically classifying regions is done by hand, and so it is difficult to see the boundary of one region of solitons (e.g. exploding) is. This was unsuccessful. 
-
+A program was written to produce soliton solutions of the complex Ginzburg Landau equation. Various ways to solve this program were explored, ultimately resulting in it being numerically solved with a split step Fourier and Runge Kutta method. A range of previously published solitons were successfully replicated. 
+\\\\
+Various machine learning techniques were learnt and polynomial regression was then used to predict properties of solitons. Various properties were tried, however the only property that could be reliably predicted was the height of a soliton. 92\% of the stationary solitons were able to have their height predicted within 2\% of the true value, and 95\% of the pulsating solitons were able to have their height predicted within 5\%  Various reasons were explored as to why this may other properties could not be predicted, and suggestions for future projects involving machine learning to predict soliton properties were given. 
 
 \unnum{chapter}{Acknowledgements}
-Chuck in some very cliché acknowledgements here.
-Thanks Nail and Adrian for helping me, etc. 
+I would like to thank Nail Akhmediev and Adrian Ankiewicz for pointing me in the right direction when I got stuck. I would also like to thank my friends who I was able to discuss machine learning with, as well as everyone else for putting up with me over the past 4 years. 
 
-\unnum{chapter}{List of Figures}
 
-\unnum{chapter}{What to add}
-Non uniqueness of solitons - Creeping vs oscillating. I think I have examples of oscillating an non oscillating.
+\chapter{Introduction to the Complex Ginzburg Landau Equation}
+The complex Ginzburg Landau equation (CGLE) is a differential equation that is typically written in the following form: 
+$$i\psi_t +\frac{D}{2}\nabla^2\psi+|\psi|^2\psi +\nu |\psi|^4\psi = i\delta \psi+i\epsilon|\psi|^2\psi +i\beta\nabla^2\psi+i\mu|\psi|^4\psi$$
+This equation describes the evolution of a number of systems, from quantum systems like superconductivity and superfluidity near phase transitions \cite{annett}, as well as classical systems like Rayleigh Benard convection\cite{wocgle} and fibre optic propagation in mode locked lasers\cite{2001}. Different systems give the CGLE for different numbers of spatial dimensions and in this thesis we consider the case where $\nabla^2\psi=\frac{\partial \psi}{\partial x^2}$ which is the case for mode locked lasers. 
 \\\\
-Do I want equation numbers?
-
-
-
-
-\chapter{Introduction to the CGLE}
-%The purpose of this chapter is to introduce the equation, explain what all the terms represent, and 
-The Complex Ginzburg Landau equation (CGLE) is a differential equation that is typically written in the following form, but also it is often written without the quintic terms ($|\psi|^4\psi$): 
-$$i\psi_t +\frac{D}{2}\psi_{xx}+|\psi|^2\psi +\nu |\psi|^4\psi = i\delta \psi+i\epsilon|\psi|^2\psi +i\beta\psi_{xx}+i\mu|\psi|^4\psi$$
-$\psi$ refers to the normalised field (normalised with respect to what?)\\
-$D = \pm 1$. if $D=1$ then normal. This means that as the optical frequency increases, the group velocity decreases. If $D=-1$ then the group velocity dispersion is anomalous, which is the opposite.\\
-$\beta>0$ is parabolic gain and $\beta<0$ effectively means that sharp spikes are filtered out. (This doesn't make sense - shouldn't it be the other way around?)
- causes spectral filtering\\
-$\delta$ is the linear gain/loss depending on whether it is positive/negative. \\
-$\epsilon$ is nonlinear gain which can arise for a variety of reasons, such as saturable absorption (absorption decreases/reflectivity increases as intensity increases.)\\
-$\mu$ and $\nu$, when negative, represents the saturation of the NL gain and NL refractive index respectively. 
+The CGLE is an amplitude equation, which means that the quantity we are modelling (e.g. intensity) is given by $|\psi(x,t)|^2$ and energy given by $\int|\psi(x,t)|^2 dx$, albeit with scaling. 
+$D$ describes the group velocity dispersion, and is typically taken to be $1$ for normal dispersion or $-1$ for anomalous dispersion. Dispersion is considered normal if when the optical frequency is increased, the group velocity is seen to decrease. The dispersion is anomalous when the relationship between the optical frequency and group velocity is reversed. It should be noted though that $D$ is not always taken to be $\pm1$\cite{spiny,spike}. 
+Parabolic gain and spectral filtering is represented by $\beta>0$. 
+$\delta$ is the linear gain-loss. 
+$\epsilon$ represents the nonlinear gain which can arise for a variety of reasons such as saturable absorption, which describes how the rate of absorption decreases as the  intensity increases.
+$\mu$ and $\nu$ describe higher order nonlinearities such as the saturation of the nonlinear gain and a nonlinear refractive index respectively. \cite{2001}
 \\\\
-This equation describes the evolution of a number of systems, from quantum systems like fibre optic propegation in mode locked lasers, superconductivity, superfluidity, as well as classical systems like Bernard Reyleigh convection.
-It is an amplitude equation, which means that the quantity we are modelling (e.g. temperature) is given by the amplitude of $\psi$, albeit with scaling. 
+The CGLE gives rise to localised formations called solitons. Solitons occur when the diffraction or dispersion is cancelled out by the nonlinearity of the system. Additionally, the CGLE describes dissipative phenomena, and so energy is not conserved. This means that for solitons to be stable the loss and gain must cancel out on average. \cite{dissys}
+\\\\
+The CGLE is often written without the quintic terms ($|\psi|^4\psi$) however it has been shown that these higher order terms are often needed for solitons to be stable in the 1D case. \cite{5th}
 
 
 
-\section{Applications and pseudo-derivation}
-The CGLE describes a wide range of phenomena. Upon setting various components to zero, we get can derive a number of equations in fluid dynamics, such as the diffusion equation, as well as the nonlinear Schr\"odinger equation. 
-On top of this, Aranson and Kramer (world of CGLE) give a method to transform a general set of hydrodynamic equations to the CGLE. This hydrodynamic equation is given as:
-$$\tau (\partial_{\tilde t}\tilde A-\tilde v_g\cdot \tilde\nabla \tilde A)=\epsilon(1+ia)\tilde A+\xi^2+(1+ib)\tilde\nabla^2 \tilde A-g(1+ic)|\tilde A|^2 \tilde A$$ 
-Aranson amd Kramer tell us that we can rescale the axes in order to get the CGLE back. 
+\section{Origins of the CGLE}
+The CGLE describes a wide range of phenomena. Upon setting various components to zero, we get the nonlinear Schrodinger equation as well as fluid dynamics equations such as the diffusion equation. This lead Aronson and Kramer\cite{wocgle} to consider the CGLE as an extension to the nonlinear Schrodinger equation that allows for dissipation and higher order nonlinearities.  
+\\
+\\
+A heuristic way of deriving the CGLE is by trying to find a general differential equation which is invariant under multiplication by a phase shift $e^{i\phi}$.\cite{hecke} This leaves few choices for the differential equation. 
+First off, any derivative will satisfy this condition. If we assume that the $\psi$ is sufficiently smooth or that the dispersion and parabolic gain is dominant, we can ignore derivatives with order greater than 2. As shown in the next paragraph, we are able to rescale our system to remove first order derivatives. Additional functions can be approximated with a Taylor expansion in terms of $\psi$ and $\psi^*$, with these elements are given by $\{\psi,\psi^*, \psi^*\psi, \psi\psi\psi^*,\psi\psi^*\psi^*, ...\}$. Of these terms, the only ones that are able to satisfy invariance under a phase shift, $\psi\rightarrow \psi e^{i\phi}$, are the terms that take the form $|\psi|^{2n}\psi$ for some positive integer n. 
+\\
+\\
+Aranson and Kramer\cite{wocgle} explicitly derive the CGLE from a general set of hydrodynamic equations. The hydrodynamic equations are able to model a range of fluid phenomena, such as Rayleigh-Benard convection cells that are formed by heating a fluid from underneath. This hydrodynamic equation is given as:
+$$\tau (\partial_{\tilde t}\tilde A-\tilde v_g\cdot \tilde\nabla \tilde A)=\epsilon(1+ia)\tilde A+\xi^2(1+ib)\tilde\nabla^2 \tilde A-g(1+ic)|\tilde A|^2 \tilde A$$ 
+This equation can be rescaled with the following transformations to get the CGLE: 
 $$\tilde A=(\epsilon/g)^{1/2} A \ exp[-i (\epsilon a/\tau)\tilde t], \ \ \tilde t = (\tau/\epsilon)t, \ \ \vec {\tilde x} = (\xi/\epsilon^{1/2})\vec x+\vec v_g \tilde t$$
-This substitution yields the cubic CGLE in the following form:
+When substituting this in, we get the CGLE up to the cubic terms:
 $$\partial_t A=A+(1+ib)\nabla^2A-(1+ic)|A|^2A$$
+If the hydrodynamic equation was generalised to have higher order nonlinearities, using the same transformations the quintic term needs to be multiplied by $ \frac{\epsilon}{g^2} $ to get the appropriate scaling.
+\\
+\\
+%As a final example, the CGLE is able to describe superconductivity near a superconducting transition. The intensity is given by $F=F_n +\alpha |\psi|^2+\frac{\beta}{2}|\psi|^4 +\frac{1}{2m}|(-i\hbar\nabla -2eA)\psi|^2+\frac{|B|^2}{2\mu_0}$, where $B$ and $A$ are the magnetic field and vector potential. The evolution equation is found with the following equation, and if there is no magnetic field the equation simplifies to the CGLE. 
+%$$\partial_t \psi = -\frac{\delta F}{\delta \psi^*} $$
 
 
-Rayleigh-Benard convection:
-step 1: it obays the swift hohenberg equation. \\
-step 2: if the convection cells are symmetric, then it needs to be invariant under $x\rightarrow -x$  and so the simplest nonlinearities we can have are $x^3$ and $x^5$. We can also then assume that the field satisfies $U=F[z] e^{\sigma t+iqx}+cc$, where sigma is the growth rate, q wavenumber, cc is the complex conjugate. 
-step 3: subbing this into the swift hohenberg equation, and assuming nonlinearities are small, the growth rate is given by $\sigma = \epsilon -D(q_c^2-q^2)^2$
-step 4: make assumptions such as $q\approx q_c$ for small $\epsilon$ and expand and simplify for the amplitude equation which gives the CGLE.
-\\\\
-If we want a general differental equation of a complex parameter which is invariant under multiplication by a phase shift $e^{i\phi}$, then we have limited choices of parameters.
-Any derivative is fine.You can get rid of first order derivatives in x by rescaling the parameter $x$. and if we assume that diffusion is dominant, we can ignore higher order derivatives. 
-\\\\
-Additional terms could be approximated with elements from $\{A,A^*, A^*A, AA^*A,A^*AA^* ...\}$, and so to be able to satisfy the invariance under phase shift, we would expect terms of the form $|\psi|^{2n}\psi$ for some positive integer n. 
-\\\\
-superconductivity has energy given by $F=F_n +\alpha |\psi|^2+\frac{\beta}{2}|\psi|^4 +\frac{1}{2m}|(-i\hbar\nabla -2eA)\psi|^2+\frac{|B|^2}{2\mu_0}$, where $B=\nabla \times A$ is the magnetic field and vector potential. This is the energy when near a superconducting transition If there is no magnetic field.
-\\\\
-We then say that the evolution equation is given by:Lyapunov functional http://pauli.uni-muenster.de/tp/fileadmin/lehre/NumMethoden/SoSe10/Skript/GLE.pdf
-$$\partial_t \psi = -\frac{\delta F}{\delta A^*} F $$
-Invariance under a phase shift, and invariant under a reflection.
-superfluidity,
-and Bose-Einstein condensation to liquid crystals
-\\\\
-THIS IS COPPIED FROM TWOTCGLE, but explains to me why it is so common.
-It provides a reduced, universal description of
-weakly nonlinear spatio-temporal phenomena in ex-
-tended (in x  ) continuous media whose linear dispersion
-is of a very general type (see below) and that are invari-
-ant under a global change of gauge [multiplication of A
-by $exp(i\phi)]$. This symmetry typically arises when A is
-the (slowly varying) amplitude of a phenomenon that is
-periodic in at least one variable (space and/or time) as a
-consequence of translational invariance of the system.
-END COPY
-\\\\
-On the first page of TWOTCGLE, he gives an example hydrodynamic equation. We see the convection-diffusion equation in part of this. Also the navier stokes is hidden in here as well. Double diffusive convection, Rayleigh Benard convection
-\\\\
-COPIED:
-he CGLE may also be viewed as a dissipative exten
-sion of the conservative nonlinear Schrodinger equation,
-END COPIED
-\\\\
-Thngs to llok at:
-There is an extensive mathematical literature on the
-CGLE, which we shall only touch upon; see, for ex-
-ample, Doering et al. (1987, 1988); van Harten (1991);
-Schneider (1994); Doelman (1995); Mielke and
-Schneider (1996); Levermore and Stark (1997); Mel-
-bourne (1998); Mielke (1998).
-\\\\
-Sinks and sources
-\\\\
-I should also add in something about fibre optic propegation as well, as a lot of the papers i use reference this.
-\\\\
-I don't think my sequence is right. Instead the taylor series should give the terms $\{A^n {A^*} ^m\}$, but we still get rid of the terms that don't satisfy the desired properties.
-\\\\
-Put in a picture to explain rayleigh-bernard convection, 
+
+
+
+
+
 
 
 \chapter{Mathematical Theory Behind Solving the CGLE}
+\section{A Brief Look at Different Methods to Solve the CGLE}
+Although some specific exact solutions have been found which solve the CGLE for specific parameter values\cite{exact}, in general it cannot be solved exactly and so numerical methods must be used instead. 
+\\
+\\
+A finite difference method was used initially before a better method was chosen. The key idea behind a finite difference method is to approximate spatial derivatives with $\frac{\partial \psi}{ \partial x}\approx \frac{\Delta \psi}{\Delta x}$. Given that $|\Delta \psi|\ll |\psi|$, the spatial derivatives will end up losing several digits of precision. Additionally, if there are sharp peaks and slowly varying features, then $\Delta x$ must be very small to ensure that the features are represented accurately, which leads the precision of $\Delta \psi$ to become even worse for the slow changing features. However there are a number of other ways for the CGLE to be solved. 
+\\
+\\
+Taha and Ablowitz \cite{taha} compared various methods for solving the nonlinear Schrodinger equation. Given that the CGLE can be seen as an extension of the nonlinear Schrodinger equation, we would expect to draw a comparable conclusion when solving the CGLE instead. 
+\\
+\\
+One method given was a pseudospectral method. This method involves replacing $\nabla^2\psi$ with $F^{-1}(-(2\pi f)^2F(\psi))$, where $F$ and $F^{-1}$ refer to the Fourier transform. Then the differential equation, $\frac{\partial \psi}{\partial t}=f(\psi)$, is evolved forwards with the step equation $\psi\rightarrow\psi+f(\psi)\Delta t$, for some small time step $\Delta t$.
+\\\\
+Another method given was the Ablowitz-Lodik global scheme. They conjectured that it would be a faster method for high amplitude solitons, however many solitons do not contain large amplitudes so there is no benefit in using this method. 
+\\
+\\
+Overall a split step Fourier method was found to be the fastest algorithm. For the CGLE this method needs to be adjusted as the quintic terms prevent it from being possible to solve in the same way. This leads to the Runge Kutta method being used as part of this split step method, which has also been done previously. \cite{2001,spiny,spike,extreme,bch}
 
-\section{A Brief look at Different Methods to solve the CGLE}
 
-A finite difference method was used initially to get it all going. This is bad because you do $\delta \psi / \delta x$, so over a small time period, the $\delta \psi$ term can lose several digits of precision, not good. There are a number of other ways for this to be solved though. 
-\\\\ 
-For the nonlinear schrodinger equation, (Taha and Ablowitz) compared various methods for solving this. While under certain conditions, some other methods were found to be better than the split step fourier method, overall it was found to be a faster algortihm. Given that the CGLE is an extension of the NLSE, this means that this should also be a reasonably good method to do this part as well. This has previously been done by other authors as well, (Wang, Zhang).
 
 \section{Split Step Fourier and Runge-Kutta Method}
-Note that in the following section, we are instead going to treat the CGLE as being the following equation which we break into linear and nonlinear parts:
-$$\frac{d\psi}{dt} = A \frac{d^2\psi}{dx^2} + B\psi + C |\psi|^2\psi + D|\psi|^2\psi = \hat L \psi + \hat N \psi$$
+In this section, the CGLE will be written in the following way in order to aid clarity of reading. The equation can be split into linear and nonlinear parts:
+$$\frac{\partial\psi}{\partial t} = A \frac{\partial^2\psi}{\partial x^2} + B\psi + C |\psi|^2\psi + D|\psi|^4\psi = \hat L \psi + \hat N \psi$$
 where the linear component is:
-$$\hat L \psi = A \frac{d^2\psi}{dx^2} + B\psi$$
+$$\hat L \psi = A \frac{\partial^2\psi}{\partial x^2} + B\psi$$
 and the nonlinear component is:
-$$\hat N \psi = C |\psi|^2\psi + D|\psi|^2\psi$$
+$$\hat N \psi = C |\psi|^2\psi + D|\psi|^4\psi$$
+The split step Fourier and Runge Kutta method assumes that the linear and nonlinear terms do not significantly affect each other over short time scales.\cite{taha} This means that we can propagate forwards according to the linear evolution equation, and then propagate forwards according to the nonlinear evolution equation. When the time step is sufficiently small this will be a good approximation for the solution to the original differential equation. For a small time step this can be represented with the following:
+$$\psi(t+\Delta t)=e^{\hat N\Delta t+\hat L\Delta t}\psi(t)\approx e^{\hat N\Delta t}e^{\hat L\Delta t}\psi(t)$$ 
+This formula is a limit of the Baker Campbell Hausdorff formula under the limit that $\Delta t\rightarrow 0$.
+Furthermore, this formula can be adjusted in the following way to make the solution more stable. \cite{bch}
+$$\psi(t+\Delta t)=e^{\hat N\Delta t/2}e^{\hat L\Delta t}e^{\hat N\Delta t/2}\psi(t)$$ 
 
-\subsection{Linear evolution (Fourier)}
-Here we are solving the equation: 
-$$\frac{d\psi}{dt}=A\frac{d^2\psi}{dx^2}+B\psi$$
-Defining the fourier transform by: 
+
+
+
+
+\subsection{Linear Evolution (Fourier) \cite{taha}}
+In this section the following equation will be solved:
+$$\frac{\partial\psi}{\partial t}=A\frac{\partial^2\psi}{\partial x^2}+B\psi$$
+The Fourier transform will be defined as: 
 $$\hat \psi(f)=\int\limits_{-\infty}^\infty \psi(x)e^{-i2\pi x f} dx$$
-By taking the fourier transform of both sides, the equation becomes:\\
-$$\frac{d \hat \psi}{dt}= (-2\pi i f)^2 A \ \hat \psi (f)+B\ \hat \psi(f)= (B-A \ 4 \pi^2 f^2) \hat \psi(f)$$
+By taking the Fourier transform of both sides, the differential equation becomes:\\
+$$\frac{\partial \hat \psi}{\partial t}= (-2\pi i f)^2 A \ \hat \psi (f)+B\ \hat \psi(f)= (B-A \ 4 \pi^2 f^2) \hat \psi(f)$$
 $$\implies \hat \psi_t(f) = e^{(B-A \ 4\pi^2 f^2)t}\hat \psi_0(f)$$
-And so upon inverse fourier transforming, we get the solution to this DE, where $\hat \psi_t(f)$ is the fourier transform at time $t$.
-The Fourier transform can be done numerically with a discrete fourier transform, as described in a later subsection.
-
-\subsection{Nonlinear evolution (Runge-Kutta)}
-Here we are solving the equation:
-$$\frac{d\psi}{dt}=C|\psi|^2\psi + D|\psi|^4\psi$$
-The runga kutta method allows you to numerically solve a 1st order differential equation. which are of the form $\frac{dy}{dt}=f(t,y)$. Similar to Euler's method (which is basically just doing a derivative from first principles), except that the runge kutta method has better convergence than this. (it goes as $h^5$ as opposed to Euler's Method which is $h^2$, the backward euler formula, $h^2$, or improved euler formula which goes as $h^3$. Here $h$ is the step size. 
-\\\\
-The steps for doing this are as follows:
-Step 1: define $f(t,y)=f(y)=C|y|^2 y  +D|y|^4 y$
-Step 2: Have an initial value for $t$ and $y$, and step size and number of steps
-Step 3: define the following:
-$$K_1 =f(t,y)=f(y)$$
-$$K_2 =f(t+0.5h,y+0.5*h*K_1)=f(y+h*K_1/2)$$
-$$K_3 =f(t+0.5h,y+0.5*h*K_2)=f(y+h*K_2/2)$$
-$$K_4 =f(t+h,y+h*K_3)=f(y+h*K_3)$$
-Step 4: we then progress forwards $t$ and $y$ in the following way:
-$$t\rightarrow t+h$$
-$$y\rightarrow y+(K_1+2K_2+2K_3+K_4)*h/6$$
+Where $\hat \psi_t(f)$ is the Fourier transform at time $t$.
+By taking the inverse Fourier transform of both sides of this equation, the differential equation can be solved. 
+The Fourier transform can be done numerically approximated by using a discrete Fourier transform.
 
 
 
 
 
 
-\iffalse
-\subsection{The relationship between a Fourier Transform and a Discrete Fourier Transform}
-I am pretty sure this entire section needs to be rewritten.\\
-We can approximate any function with a Fourier series. (by applying periodic boundary conditions)\\
-$$f(t)=\sum\limits_{-\infty}^{\infty} c_n e^{i n t}$$
-Multiplying both sides by $e^{-i m t}$ and integrating from 0 to $2\pi$, and dividing by $2\pi$:
-$$\frac{1}{2\pi} \int\limits_{0}^{2\pi} f(t)e^{-i m t}dt = \frac{1}{2\pi} \sum \limits_{n=-\infty}^{\infty} c_n \int\limits_{0}^{2\pi} d^{i (n-m) t} dt= c_m$$
-$$\frac{1}{2\pi} \int\limits_{0}^{2\pi} f(t)e^{-i m t}dt =c_m$$
-We use the substitution:
-$$t = \frac{2\pi}{L}  x \implies x = \frac{L}{2\pi} t$$
-$$dt = \frac{2\pi}{L}  dx$$
-And then this becomes:
-$$c_m = \frac{1}{L} \int\limits_{0}^{L} f(x) e^{-i m 2\pi x/L} dx $$
-
-For a fourier series $\{c_n\}$, the fourier transform is given given by:
-
-$$\hat f (freq) = \sum\limits_{-\infty}^{\infty} c_n \mathscr{\hat F}(e^{i n 2 \pi x/L})(freq)$$ 
-
-But we have $$\mathscr{\hat F}(e^{i n 2 \pi x/L}) = \int\limits_{-\infty}^\infty e^{i n 2 \pi x/L}e^{-i 2\pi freq x} dx $$
-$$= \int\limits_{-\infty}^\infty e^{i x (n 2 \pi /L - 2\pi freq )}dx = 2\pi \delta (n 2\pi/L -2\pi freq)= \delta (n /L - freq)$$
-
-And so we get:
-$$\hat f (freq) = \sum\limits_{-\infty}^{\infty} c_n \delta(freq.- n/L)$$
-$$= \sum\limits_{-\infty}^{\infty} c_n /L \delta(freq. L- n)$$
-
-If we inverse fourier transform we get the following.
-We can also use $x/L=n/N$
-$$Data = spacial,  Fata=frequency$$
-
-
-I don’t think the following is useful:
-$$f(x)= \sum\limits_{n=-\infty}^\infty f_n e^{2\pi i n x/L} $$
-If we multiply both sides by $e^{-2\pi i m x/L}$ and integrate we get:
-$$\int \limits_{-\infty}^\infty f(x)e^{2\pi i n x/L} dx = \sum\limits_{n=-\infty}^\infty  f_n  \int \limits_{-\infty}^\infty  e^{i 2 \pi x/L (n-m)} dx  =  \sum\limits_{n=-\infty}^\infty  f_n  \int \limits_{-\infty}^\infty  e^{i 2 \pi x (n-m)/L} dx  $$
-$$=  \sum\limits_{n=-\infty}^\infty  f_n \delta((n-m)/L) = f_n \delta((n-m)/L)$$
-\fi
-
-
-
-
-\subsection{The relationship between a Fourier Transform and a Discrete Fourier Transform:}
-Below works for periodic boundary conditions, or if you assume that the function goes to zero at the boundary. For ease of proving the relationship, we assume the latter. 
-\\\\
-Defining the Fourier transform as:
+\subsection{The Relationship Between the Fourier Transform and Discrete Fourier Transform}
+Below the relationship between a Fourier transform and a discrete Fourier transform is derived. While the explanation given can be adjusted for periodic boundary conditions, it is easier to show the relationship if it is assumed that the function is zero outside of some domain. With this assumption, the Fourier transform can be written as:
 $$\tilde \psi(f) = \int_{-\infty}^\infty \psi(x) e^{-i2\pi xf} dx \approx \int_0^L\psi(x)e^{-i2\pi x f}dx$$
-Let $\Delta x=L/N$ for some integer $N$.
+Let $\Delta x=L/N$ for some integer $N$. The Fourier transform can then be approximated by:
 $$\approx \sum\limits_{n=0}^{N-1}\psi(n \Delta x) e^{-i 2\pi n \Delta x f}\Delta x$$
-With the same arguments, we get the inverse Fourier transform to be:\\ 
-($\Delta f = (f_1-f_0)/N$, for some values of $f_1$ and $f_2$)
-$$\psi(x) = \int_{-\infty}^\infty \tilde\psi(f)e^{i 2\pi x f} df \approx \int_{f_0}^{f_1}\tilde\psi(f)e^{i 2\pi x f}df \approx \sum\limits_{m=0}^{N-1}\tilde\psi(f_0+m\Delta f)e^{i 2\pi n\Delta x f_0} e^{i 2\pi x m\Delta f}\Delta f$$
-Let $\psi(n\Delta x) = \psi_n$ and $\tilde\psi(f_0+m\Delta f) = \tilde \psi_m$ and let $f_0=-\pi/\Delta x$ 
+Let $\Delta f = (f_1-f_0)/N$, for some values of $f_1$ and $f_2$. With the same reasoning as before, the inverse Fourier transform can be approximated as the following:
+$$\psi(x) = \int_{-\infty}^\infty \tilde\psi(f)e^{i 2\pi x f} df \approx \int_{f_0}^{f_1}\tilde\psi(f)e^{i 2\pi x f}df $$
+$$\approx \sum\limits_{m=0}^{N-1}\tilde\psi(f_0+m\Delta f)e^{i 2\pi n\Delta x f_0} e^{i 2\pi x m\Delta f}\Delta f$$
+Let $\psi(n\Delta x) = \psi_n$ and $\tilde\psi(f_0+m\Delta f) = \tilde \psi_m$
 $$\tilde \psi_m\approx \Delta x \sum\limits_{n=0}^{N-1}\psi_n e^{-i 2\pi n \Delta x f_0}e^{-i 2\pi n m \Delta x \Delta f}$$
 $$\psi_n  \approx \Delta f e^{i 2\pi n\Delta x f_0}\sum\limits_{m=0}^{N-1}\tilde\psi_m e^{i 2\pi n m \Delta x \Delta f}$$
-Since the definition of the discrete Fourier transform is
-$$\tilde A_m =  \sum\limits_{n=0}^{N-1} A_n e^{-i 2\pi n m/N}$$
-$$A_n  = \frac{1}{N}\sum\limits_{m=0}^{N-1}\tilde A_m e^{i 2\pi n m/N}$$
-We now have a way to compute (inverse) Fourier transforms given a set of data that is a sufficiently good approximation of the initial function.
-\\\\
-We want $f_1-f_0=1/\Delta x$ so that the frequency difference corresponds to the difference between adjacent elements. This means we get $\Delta f = 1/(N\Delta x)$. We then choose to take $f_0=\frac{-1}{2\Delta x}$ is chosen so it satisfies the Nyquist limit.
+The frequency difference should correspond to difference between adjacent elements, giving $f_1-f_0=1/\Delta x$. This means that $\Delta f = 1/(N\Delta x)$. The Nyquist sampling theorem says that for a set of equally spaced data sampled from a signal, the highest frequency that can be reproduced is half of the sampling frequency, and so $f_0=\frac{-1}{2\Delta x}$. This allows the approximation of the Fourier transform to be further simplified:
 $$\tilde \psi_m\approx \Delta x \sum\limits_{n=0}^{N-1}\psi_n e^{i \pi n }e^{-i 2\pi n m/N}=\Delta x \sum\limits_{n=0}^{N-1}\psi_n (-1)^n e^{-i 2\pi n m/N}$$
 $$\psi_n  \approx \frac{e^{-i \pi n}}{N\Delta x}\sum\limits_{m=0}^{N-1}\tilde\psi_m e^{i 2\pi n m/N}=\frac{(-1)^n }{N\Delta x}\sum\limits_{m=0}^{N-1}\tilde\psi_m e^{i 2\pi n m/N}$$
-
-
-\subsection{Combining these operations}
-With the split step fourier method, we assume that the linear and nonlinear terms do not affect each other over short timescales. This means that we can propegate forwards according to the linear evolution equation, and then propegate forwards according to the nonlinear evolution equation, and we should get a good approximation for the solution to the original differential equation. This can be represented as the following, where $\hat N$ refers to the nonlinear evolution operator, and $\hat L$ refers to the linear evolution operator.
-$$\psi(t)=e^{\hat N(t)}e^{\hat L(t)}\psi(0)$$ 
-It turns out, however, that a more stable way of doing this evolution is with the following (notice that the two outside terms are both evolution operators for half of the time period):
-$$\psi(t)=e^{\hat N(t/2)}e^{\hat L(t)}e^{\hat N(t/2)}\psi(0)$$ 
-
-
-Baker Campbell Hausdoff
-Lie Product Formula
-Trotter Product Formula
-
-
-
-\section{Testing the Code}
-I compared with mathematica and got the same answer with initial conditions ------ and step size ------ for both the linear and NL parts.\\
-Also I subbed in exact solns to the NLSE and it matched.\\
-Upon decreasing the step size, if the solution doesn't change significantly, we expect a very similar answer. \\
+The discrete Fourier transform and its inverse is defined in the following way:
+$$\tilde A_m =  \sum\limits_{n=0}^{N-1} A_n e^{-i 2\pi n m/N}$$
+$$A_n  = \frac{1}{N}\sum\limits_{m=0}^{N-1}\tilde A_m e^{i 2\pi n m/N}$$
+Hence the (inverse) Fourier transform can be computed using a discrete (inverse) Fourier transform providing that the data is multiplied element-wise by the appropriate constant. 
 \\
-Additionally, as previously done, there are a number of papers which give interesting solutions to the CGLE, and we can reproduce these solitons.
+\\
+The main limitation of this method occurs if the sampling rate is too low. When this happens, aliasing can occur which will causes the frequencies found with the Fourier transform to have the wrong amplitudes, as demonstrated in figure \ref{aliasing}.
+\begin{figure}[h]
+\centering
+\includegraphics[width=3.6in]{aliasing}
+\caption{A small sampling rate can result in the aliasing of the function. This leads to the amplitudes of the frequencies being wrong, and hence the function will not evolve correctly in time.}
+\label{aliasing} 
+\end{figure}
 
 
 
 
 
-
-
-
-
-\chapter{Types of solitons}
-You need to wait for the transient response to go away, and keep the rest (only interested in the long term behaviour)
+\subsection{Nonlinear Evolution (Runge-Kutta) \cite{boyce}}
+In this section, the following equation will be solved:
+$$\frac{\partial\psi}{\partial t}=C|\psi|^2\psi + D|\psi|^4\psi$$
+The Runge Kutta method is used to numerically solve any first order differential equation which takes on the form $\frac{d\psi}{dt}=f(t,\psi)$. It is similar to the Euler method, which solves equations with the following step equations for some small time step $\Delta t$:
+$$\psi\rightarrow \psi + f(t,\psi)\Delta t $$
+$$t\rightarrow t+\Delta t$$
+The Runge Kutta method has better convergence than the Euler method, and has an error of $O(\Delta t^5)$, compared with $O(\Delta t^2)$. 
 \\\\
-There are many types of solitons, however an explicit expression for the function usually cannot be found. 
+The first step of the Runge Kutta method is to define $f(t,\psi)=C|\psi|^2 \psi  +D|\psi|^4 \psi$. Next, the initial conditions, step size and the total number of steps to be taken need to be chosen.
+For each iteration, we define the following:
+$$K_1 =f(t,\psi)$$
+$$K_2 =f(t+\Delta t/2,\psi+K_1 \Delta t/2)$$
+$$K_3 =f(t+\Delta t/2,\psi+K_2 \Delta t/2)$$
+$$K_4 =f(t+\Delta t,\psi+K_3\Delta t)$$
+Finally, $\psi$ and $t$ are evolved forwards in time by updating the system in the following way:
+$$t\rightarrow t+\Delta t$$
+$$\psi\rightarrow \psi+(K_1+2K_2+2K_3+K_4) \ \ \Delta t/6$$
 
-While many explicit solutions for the schrodinger equation have been found, with additional nonlinearity means that finding explicit solutions to the CGLE is often not possible.
-\\\\
-(Jia-Min Zhu and Zheng-Yi Ma (2007),Pierre Hillion (2012), Mihalache and Panoiu (1992), Yan-Ze Peng and Krishnan (2007) =  Schrodinger equation)
-\\\\
-We can classify solitons depending on their behaviour.
-Stationary solitons maintain a constant amplitude.
-Pulsating solitons are another type, and can be categorised into subsets such as "plain pulsating",  "exploding" and creeping. \\\\
-Plain pulsating solitons are periodic and don't exhibit any significant features, as given in figure \ref{plain}.
+
 \begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{plain}
-\caption{The 2D plot of a plain pulsating soliton with parameters ..........}
-\label{plain} 
+\hspace*{-1.cm}
+%\centering
+\includegraphics[width=5.8in]{goodbadres}
+\caption{Above the CGLE has been solved with the same initial conditions and with parameters $\epsilon=1.0,\ \delta=-0.1,\ D=1, \ \beta=0.125, \ \mu=-0.1,\ \nu=-0.6$\cite{2001}. The left and right images has $t$ steps of 0.02 and 0.01 respectively, resulting in significantly different solutions.}
+\label{goodbadres} 
 \end{figure}
-Exploding solitons are characterised by a sharp jumps in their energy profile, as given in figure \ref{expl_profile}, with the 2D intensity given in figure \ref{expl}. Other solitons will, instead of exploding outwards, give a high intensity spike, as in figure \ref{highamp} whose energy increases by >10 times because of the spike
-\begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{expl_profile}
-\caption{The profile of an exploding soliton with parameters ..........}
-\label{expl_profile} 
-\end{figure}
-\begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{expl}
-\caption{The 2D intensity of an exploding soliton with parameters ..........}
-\label{expl} 
-\end{figure}
-\begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{highamp}
-\caption{The 2D intensity of a high amplitude soliton with parameters ..........}
-\label{highamp} 
-\end{figure}
-As parameters are varying, unusual behaviour can also be seen. 
-For example, with the set of parameters (---------), when varying $\epsilon$, periodic doubling can be seen, as in figure \ref{periodic_doubling}. As the parameter c is increased, the the height of the solitons changes to a period 2 then a period 4 cycle. 
-\begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{periodic_doubling}
-\caption{The energy profile of 3 solitons, with periodic doubling being seen. Parameters .........., for these images, the actual domain is from 0 to 100.}
-\label{highamp} 
-\end{figure}
-
-We also get solitons that creep sideways as they oscillate.
-An example is given in figure ------- of a soliton that creeps to the right forever. Another example is in figure \ref{periodpulse} 
-\begin{figure}[h]
-\centering
-\includegraphics[width=2.6in]{periodpulse}
-\caption{A creeping, pulseating soliton that is also periodic. Note that the weird patterning inside the image is from aliasing. params ---------}
-\label{periodpulse} 
-\end{figure}
-
-
-\section{Previous things done to classify solitons in to regions}
-The issue we have at the moment is that there are 6 parameters, and if we take 100 data points over a given range, we would need to calculate $10^12$ parameters. In addition, many parameters are given with high precision, and if we were to replicate this (high amplitude pulse), we would need many, many more points to plot. Given that each simulation takes a while with high precision, it is not an easy task to classify different regions, and typically has been done by hand and/or over a small region of space.
-\\\\
-Regions plotted are, for example, where exploding solitons occur, we get bifurcations in peak height. 
+\section{Testing the Code}
+The linear and nonlinear step equations were individually compared with a numerical result from Mathematica to ensure that this implementation was done correctly. Next the program was compared to an exact solution of the nonlinear Schrodinger equation to ensure that the split step component was implemented correctly. 
+Finally, there are a number of papers which give interesting solutions to the CGLE, and these were reproduced as elaborated in a later chapter. This was able to give confidence that this algorithm was correctly implemented. 
+Finally, it is important to note that if an interesting soliton is found, it may end up simply being an artefact of a large step size, as in figure \ref{goodbadres}. If the step size and spatial resolution are improved and the resultant soliton does not significantly change, then this can be claimed as a solution to the CGLE.
 
 
 
-
+% While many explicit solutions for the nonlinear Schrodinger equation have been found, with additional nonlinearity means that finding explicit solutions to the CGLE is often not possible.
+%\\\\
+%(Jia-Min Zhu and Zheng-Yi Ma (2007),Pierre Hillion (2012), Mihalache and Panoiu (1992), Yan-Ze Peng and Krishnan (2007) =  Schrodinger equation)
 
 
 
 
 
 \chapter{Machine Learning Theory}
-\section{Different Types of Machine Learning}
-Very quickly summarise the MOOC.\\
-I just need linear regression.
+Since the CGLE has 6 parameters that can be varied, if 100 data points were taken over a given range for each parameter there would be $10^{12}$ different solutions that would need to be calculated. Given that each solution takes on the order of a minute each, this cannot be done. In the past, people have only varied one or two parameters at a time and have eneded to draw conclusions from this small slice of the sample space.\cite{2001, spiny, spike, extreme} Instead of explicitly trying to calculate a vast number of solitons for a wide range of parameters it may be possible to use machine learning to predict information about these solitons.
 
-\section{Linear Regression}
-Former Title: Different Options for the Machine Learning Algorithm\\
-Another Title Removed: A detailed look at neural networks\\
-\\
-Step 1: Define a cost function:\\
-Suppose we have input parameters $\vec x_i$ with the true value given by $y_i$. For linear regression, we choose $\vec\theta$ such that our prediction for the value of $y_i$ is $\vec\theta \cdot \vec x_i$. We want to vary the vector $\vec \theta$ such that the predictions match as best as possible. This is typically done by providing a cost function that is lowest when the predictions match the true value best. A typical cost function is (least squares):
+
+
+
+\section{Different Types of Machine Learning}
+As part of my thesis, I did the online machine learning course by Stanford University. \cite{mooc} This course covered a number of techniques such as linear regression, neural networks, support vector machines, principle component analysis, k-means clustering, anomaly detection and recommender systems. Below is a summary of the methods covered.
+\\\\
+Linear Regression: Good for predicting a specific value. Given the input parameters, we want to predict a specific value for the output. Polynomial regression is linear regression with polynomial features. This is described in more detail below.
+\\\\
+Neural Networks: Good for classifying a binary option for complex systems. I.e. does this property hold, yes or no?
+\\\\
+Support Vector Machine (SVM): Good for classifying a binary option, providing that the boundary is not too unusual. See figure \ref{svmneural} to get an idea as to when a SVM may be a better option than a neural network.\begin{figure}[h]
+\centering
+\includegraphics[width=4.6in]{svmneural} 
+\caption{Left, an SVM aims to find a boundary to classify the data with. Right, more complicated boundaries can be better modelled with a neural network.}
+\label{svmneural} 
+\end{figure} \\\\
+Principle Component Analysis: Suppose there is a 2D plane embedded in 3 dimensions. Principle component analysis provides a method to reduce the dimensionality to two dimensions, and can be generalised to higher dimensions.
+\\\\
+K-Means Clustering: This technique is used to collect data into groups when you don't know what the groups are, as in figure \ref{kmeans}.\begin{figure}[h]
+\centering
+\includegraphics[width=2.6in]{kmeans}
+\caption{K-Means Clustering. Initially the number of clusters is guessed. Then the red dots are moved such that they minimise the distance to nearby points. Any new point is part of the cluster whose red dot is closest.}
+\label{kmeans} 
+\end{figure}
+\\\\Anomaly Detection: The purpose of anomaly detection is to determine whether a set of parameters is unusual. If the distribution of each parameter is not Gaussian, it needs to be transformed to a Gaussian-like distribution. The variables can be either independent of each other or linearly correlated as in figure \ref{anomaly}. This technique is preferred over SVMs and neural networks if there are only a small number of examples of anomalies.\begin{figure}[h]
+\centering
+\includegraphics[width=2.6in]{anomaly}
+\caption{Anomaly Detection. The data are transformed so that each variable follows a Gaussian-like distribution. In this example, there is a linear correlation between the two variables. The goal of anomaly detection is to be able to return the red dot as an error.}
+\label{anomaly} 
+\end{figure}\\\\
+Recommender System: Given a customer's previous purchases/etc. what are they likely to want to buy next. This prediction is based on what other, similar people have done.
+\\\\
+I decided to try and predict properties of solitons such as the energy, width of the soliton, and maximum height. The technique that is best suited for this is polynomial regression. 
+
+
+
+
+
+
+
+\section{Polynomial Regression}
+Suppose we have input parameters $\vec x_i$ with the true value of the property to predict being $y_i$. For linear regression, we choose $\vec\theta$ such that our prediction for this value is $\vec\theta \cdot \vec x_i$. We want to vary the vector $\vec \theta$ such that the predictions match as best as possible. This is done by providing a cost function that is lowest when the predictions best match the true value. The least squares cost function is the following, where $(\vec x_i,y_i)$ is the $i^{th}$ example used to train the algorithm.
 $$J_\theta = \sum_i \left(\vec\theta\cdot \vec x_i -y_i\right)^2 $$
-\\
-Suppose we have two parameters, we might get an image as shown below. 
 \begin{figure}[h]
 \centering
 \includegraphics[width=3in]{GradDescent}
-\caption{Gradient descent example}
-\label{corr} 
+\caption{The algorithm finds the minima by continually taking the path with the steepest gradient. For linear regression, the minimum is guaranteed to be unique.}
+\label{graddesc}
 \end{figure}
-The minimum of this graph give $\theta$ which causes the best predictions. 
-Typically the algorithm to find the minimum is done by continually taking the steepest path. However the algorithm may end up finding a local minima, as in the subsequent figure. 
+\\
+Suppose there are two parameters. The cost function may then look something like that in figure \ref{graddesc}.  
+The minimum of this graph gives the value of  $\vec\theta$ which gives the best overall prediction. 
+Typically the algorithm to find the minimum is done by continually taking the steepest path. Something that might be of concern is whether the algorithm will converge to a local minimum, rather than the global minima. However since the cost function, including the regularised cost function discussed below, is convex, the minimum is unique.
 \begin{figure}[h]
 \centering
-\includegraphics[width=2in]{localmin}
-\caption{Gradient descent example}
-\label{corr} 
+\includegraphics[width=3in]{overfit}
+\caption{While the solid blue line fits gives a lower cost, the dashed black line will be more likely to fit new data points well, and so is a better estimate.}
+\label{overfit}
 \end{figure}
-Octave has lots of fancy functions that can do this really efficiently, and can try to avoid local minima.
-\\\\
-We can increase the number of input features. One feature we want to add is an intercept term, which will equal $1$ for every training example. Other features we might want to add, for example, would be the polynomial features $\{x_1^2,x_1x_2,x_1x_3, ... \}$. However if we add in these extra features, we are faced with another issue, and that is overfitting. If we have a high degree polynomial, it becomes much easier to overfit the data. In order to prevent this, we can adjust the cost function to:
+\\\\The number of input features can be increased by adding in an intercept term (i.e. take $x_0=1$ for all training examples) or by adding in polynomial features $\{x_1^2,x_1x_2,x_1x_3, ... \}$. However by adding in these extra features, the algorithm may not accurately represent the true relationship. If there are many polynomial features it becomes much easier to over fit the data as in figure \ref{overfit}. In order to prevent this the cost function can be adjusted by adding in a regularisation term. The cost function then becomes:
 $$J_\theta = \frac{1}{2m}\sum_i \left(\vec\theta\cdot \vec x_i -y_i\right)^2 +\frac{\lambda}{2m} |\vec\theta|^2$$
-By doing this, if several of the elements of $\vec \theta$ are large, then the cost will increase, and so only the important features will remain large. However for this to work we must normalise the data, and in my program this is done by transforming each feature $x_i^{(j)}$  in the following manner, where the $i$ indicates that it is the $i^{th}$ training example, and the $j$ index refers to the $j^{th}$ component of the vector. Below $\mu^{(j)}$ refers to the mean of the $j^{th}$ component of all the training examples, and $\sigma^{(j)}$ the standard deviation
+By doing this, if several of the elements of $\vec \theta$ are large, then the cost will increase and this set of parameters will no longer be at the minima. This helps to ensure that only the important features will remain large. For this to not penalise one parameter more than another, the data need to be normalised. This can be done by transforming each feature $x_i^{(j)}$  in the following manner, where the $i$ indicates that it is the $i^{th}$ training example, the $j$ index refers to the $j^{th}$ component of the vector, $\mu^{(j)}$ refers to the mean of the $j^{th}$ component of all the training examples, and $\sigma^{(j)}$ is its standard deviation.
 $$x_i^{(j)}\rightarrow \frac{x_i^{(j)}-\mu^{(j)}}{\sigma^{(j)}}$$
-This ensures that all of the features are on the same scale, and so the elements of $\theta$ are penalised equally by the cost function. 
-
-
-
-\section{Training and Testing the Algorithm}
-
-Tried initially with only linear terms, then expanded to polynomial terms with regularisation and it was able to fit data with polynomial features $(0.5x_1+x_2^3)$. This game me the confidence that the algorithm was working correctly, and so I could go ahead and train the algorithm on real data with confidence.\\\\
-My algorithm went up to 4th order polynomial terms, and with 6 different parameters being varied, this results in a total of 210 features. 
-
-
-
-
-\chapter{The result from much work}
-\section{The sorts of things that I was looking for}
-I now want to say something about what data I tested.\\
-I took random parameters between (range) for all $\beta, \delta, D, \epsilon, \mu, \nu$\\
-I ran the program for 350 time units with step size of 0.01. xrange = 40 with stepsize 0.01. Only the last 50 time units was kept so that it has time to stabilise into a stable soliton. 
+This transformation ensures that all of the features are on the same scale, allowing all features to be penalised equally by the cost function. 
 \\\\
-looking only at the last 50 time units to get this info.
-Data recorded for each simulation: frequency of oscillation, max energy-min energy,  difference between max and min standard deviation, and height difference. Height difference is the maximum height minus the minimum height in that same column(i.e. if the maximum occurs in column 50, then we look for the minimum value in column 50)
-\\\\
-The freq is calculated by finding peaks in the energy profile, and taking the average distance between these peaks to be the period. Again, this is not neccessarily a constant, for example IMAGE.
-\\\\
-Once I have predicted things, plot the number within 5\% of the true value (and then 10\%, etc.). Keep in mind that I don't want all points matching well. For example, THIS IMAGE has multiple solitons being propagated forwards in time in parallel. This won't affect some things like period much, but it will effect the standard deviation. 
-\\\\
-\section{What was the accuracy?}
-Plot the \% that was within $x$ from the true value (e.g. what percentage of the predicted frequency is within 5\%,10\%,15\% of the true value )
-
-\section{Plots of regions}
-Once this has been trained, plot the data for various regions, and compare with other other region plots that we have. (e.g. exploding vs normal solitons)
+This algorithm was tested by making data that satisfied $y = 1.5+3.5x_1+3.5x_2x_3$. Unused features were set to random numbers. The algorithm was able to converge to the correct result giving confidence that it has been correctly implemented so it should run appropriately when trained with data from the solitons. 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+\chapter{Replication of Previous Results}
+Solutions were found by setting the initial state as a Gaussian pulse. This was evolved forwards in time until the transient response was gone. 
+Solitons can be categorised into a number of types. First off there are stationary solitons whose profile remains steady in time. Solitons can also be found to pulsate. The simplest type is known as a plain pulsating soliton and is characterised by being periodic, recovering its original shape after a fixed amount of time. An example is given in figure \ref{plain}.\cite{2001}
+\begin{figure}[h]
+\centering
+\includegraphics[width=3in]{plain}
+\caption{A plain pulsating soliton with parameters $\epsilon=0.66,\ \delta=-0.1,\ D=1, \ \beta=0.08, \ \mu=-0.1,\ \nu=-0.1$. \cite{2001}}
+\label{plain} 
+\end{figure}
+\\\\
+Another type of pulsating solitons is known as an exploding or erupting soliton. Ripples and other imperfections can be seen to build up before there is a sharp jump in it's energy profile, as given in figure \ref{exploding}.  Additionally, the time between explosions may be chaotic. \cite{2001}%TODO [40]
+\begin{figure}[h]
+%\centering
+\hspace*{-1.4cm}
+\includegraphics[width=6in]{exploding}
+\caption{Left: The intensity of an exploding soliton. Right: the energy of the same exploding soliton. The parameters are $\epsilon=1.0,\ \delta=-0.1,\ D=1, \ \beta=0.125, \ \mu=-0.1,\ \nu=-0.6$.\cite{2001}}
+\label{exploding} 
+\end{figure}
+\\
+Other pulsating solitons can be periodic and give high intensity spikes. This is seen in figure \ref{highamp} whose energy increases over 10 times because of the spike. \cite{extreme}
+\begin{figure}[h]
+%\centering
+\hspace*{-1.4cm}
+\includegraphics[width=6in]{extremepulse}
+\caption{A periodic soliton with a high intensity spike. The parameters are $\epsilon=0.95,\ \delta=-0.1,\ D=-1, \ \beta=0.125, \ \mu=-0.0005,\ \nu=0.1$.\cite{extreme}}
+\label{highamp} 
+\end{figure}
+\\\\
+High intensity spikes can also have a much narrower width. Some solitons periodically get extremely narrow spikes \cite{spike}, bit it is also possible to get high intensity spikes occurring chaotically, known as a spiny soliton. The intensity profile is given in figure \ref{spiny} along with a zoomed in version of the original soliton.
+\begin{figure}[h]
+%\centering
+\hspace*{-1.4cm}
+\includegraphics[width=6in]{spiny}
+\caption{A spiny soliton gets high intensity spikes and exhibits a chaotic pattern that resembles noise. The parameters are $\epsilon=0.04,\ \delta=-0.08,\ D=-2.7, \ \beta=0.18, \ \mu=-0.000025,\ \nu=-0.002$.\cite{spiny}}
+\label{spiny} 
+\end{figure}
+\\\\
+%By varying parameters, other interesting behaviour can also be seen, such as periodic doubling. Figure \ref{periodicdoubling} 
+%TODO
+%shows a 1 cycle, 2 cycle, and 4 cycle occur as $\epsilon$ is varied. %figure \ref shows the bifurcation diagram for this process. 
+Finally, we can also get pulsating solitons that move, called creeping solitons. An example is given in figure \ref{periodpulse} which in a sinosoial manner, however by varying the initial conditions, it could be made to continually creep right.
+%creeps right forever as it oscillates. By varying the initial pulse, but keeping the parameters the same, this pulse can instead be made to creep in sinusoidal way.%TODO creeping, sinusoidal and the two initial pulses. 
+%TODO creeping, both sinusoidal and rightwards only
+\begin{figure}[h]
+\centering
+\includegraphics[width=3.6in]{periodpulse}
+\caption{A creeping, pulsating soliton that is also periodic. Note that the unusual patterning inside the image is from aliasing. The parameters are $\epsilon=1.3,\ \delta=-0.1,\ D=1, \ \beta=0.101, \ \mu=-0.3,\ \nu=-0.101$.\cite{2001}}
+\label{periodpulse} 
+\end{figure}
+%I feel like I should add something like you can get two types with the same parameter
+
+
+
+
+
+
+
+
+\chapter{Results from Machine Learning}
+\section{Collecting the Data}
+A Gaussian pulse was used as the initial condition for all the solutions and was propagated for 700 units of time. Information such as the width and maximum height was taken from the last 100 time units so that the transient behaviour is less likely to still be present. A time step of 0.01 and spatial resolution of 0.01 were used, as this gave reliable results for many examples. This does exclude some of the high amp pulses, but otherwise it would have taken too long to calculate. In the simulations, these dissipate to nothing and so are not included in the machine learning data. For each solution, the average frequency, maximum standard deviation, maximum height, maximum energy were recorded as well as the maximum difference in standard deviation and energy. The parameters were chosen by generating random numbers over the following ranges. These ranges were chosen as they covered a many of the examples given in \cite{2001}. 
+$$\delta: (-0.5,0.1)$$
+$$\beta: (0,0.2)$$
+$$D: (-1.5,1.5)$$
+$$\epsilon: (0.5,1)$$
+$$\mu: (-0.13,-0.07)$$
+$$\nu: (-0.09,-0.05)$$
+\\
+It should be noted though that not all solutions of the CGLE will be localised solitons. There are a range of parameters where solutions called fronts exist. Fronts are characterised by having an increasing width, and given enough time it is able to be as wide as you want. \cite{2001}
+Solutions that take up a large proportion of the periodic range should also be ignored as otherwise unusual effects can arise caused by this periodicity. 
+\begin{figure}[h]
+\centering
+\includegraphics[width=6in]{unwanted}
+\caption{Both of these results are unwanted solutions to the CGLE for machine learning. Left: A front with parameters $\epsilon=0.8,\ \delta=-0.1,\ D=1, \ \beta=0.08, \ \mu=-0.95,\ \nu=-0.08$. Right: An unwanted solution in part caused by the periodic boundary condition. Parameters are $\epsilon=0.5,\ \delta=-0.12,\ D=1, \ \beta=0.01, \ \mu=-0.1,\ \nu=-0.05$. }
+\label{unwanted} 
+\end{figure} 
+These solutions can be filtered in the following way. First, the mean is found and is set to be the centre of the periodic boundary. If 65\% of the energy was not within a quarter of the way to the mean, it was deemed to most likely be either a front or another solution that could be ignored for the machine learning algorithm. Examples of this are given in figure \ref{unwanted}. 
+\\
+\\
+Of the solutions that were not discarded, around 28500 examples were found which were not stationary solitons and 1300 were deemed to be examples of pulsating solitons. 
+60\% of this data was used to train the machine learning algorithm. 20\% was used for the cross validation (CV) as a way to determine the ideal number of polynomial features, and 20\% was used to determine the the final accuracy of the algorithm. If there are a small number of features, the algorithm will not be able to fit either the cross validation set or the training set well. If there are too many features, it will over fit the training data, resulting in a low cost for the training data and a high cost for the cross validation data. This is shown in figure \ref{cv}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=3in]{cv}
+\caption{When the number of parameters is small, the algorithm does not fit either the training or the cross validation set well. In contrast, too many features results in the training set fitting well and the cross validation set fitting well. The ideal number of parameters occurs at the minima.}
+\label{cv} 
+\end{figure} 
+
+
+
+
+\section{Results}
+The machine learning algorithm was run including third order polynomial features (84 parameters) up to 9th order (5005 parameters). to try and get data that resembles figure \ref{cv}. By doing this, the ideal polynomial order can be determined. This data is in the appendix. 
+\\\\
+The ideal parameter was then used to determine the accuracy of the prediction with the test data. The only data property tested that had a reliable prediction was for the height of a stationary soliton. This could predict an answer within 2\% of the true value for 92\% of the data. The next closest was the maximum height of an pulsating soliton, which within 2\% for 67\% of the data and this went up to 95\% when a 5\% margin was given. Below is a summary of these results.
+\begin{center}
+\begin{tabular}{|l|l|l|l|}
+\hline
+Property & Percentage with & Percentage with\\ %& Percentage with \\
+ &  error below 2\% & error below 5\% \\%& error below 10\% \\
+\hline
+Nonpulsating Height&92&98\\
+Nonpulsating Energy&9&14\\
+Nonpulsating S.D.&0&2\\
+Pulsating max. Height&67&95\\
+Pulsating max. S.D.&0&25\\
+Pulsating max. Energy&8&20\\
+Pulsating Frequency&9&19\\
+Pulsating max. Energy Diff&6&8\\
+Pulsating max. S.D. Diff &0&1\\
+\hline
+\end{tabular}
+\\Table: The proportion of correct guesses at a 2\% threshold.
+\end{center}
+The worst fitting solutions were isolated to try and understand why so many of these were very poor. Most of the worst examples had multiple solitons evolving in parallel and so this would significantly skew the results for energy and standard deviation.
+\\\\
+One potential way to get around this would be to start of with a single soliton, and as it evolves, vary the parameters until it reaches the desired parameters. Since this would be a gradual process, it would be less likely to split up into multiple solitons, compared to an arbitrary initial pulse. This could also have the advantage of allowing for the high amplitude solitons, as the frequency could be monitored and the propagation time and resolution could be adjusted accordingly. 
+\\\\
+Alternatively, the number of peaks in the x direction could be counted. However solitons often have multiple local maxima and so the threshold for a peak would need to be set high so that solitons are not unnecessarily discarded.
+\\\\
+Something else that could be tried is to classify exploding or high amplitude solitons with a neural network or SVM. This could be done by setting a threshold increase from the base soliton to determine whether it is an exploding/high amplitude soliton. 
+\\\\
+Yet something else that could be looked at is the rate of expansion of fronts, and this could be modelled in a similar way to machine learning, however the issue with this is that a new method to discard other unwanted solutions would need to be found. 
+\\\\
+Another significant way to improve the accuracy for pulsating solitons would be to get more data. The stationary solitons went up to a significantly higher number of parameters. This could only be done without overfitting occurring as there was a large sample size. If we expect pulsating properties to be at least as complicated, then a significantly larger sample size must be used. The larger sample size was not available when running these training algorithms, as the computer being used to run the simulation was frequently being used by other people. 
+\\\\
+A final improvement would be to go through the list of features and remove those that contribute only a small amount to the total prediction. Especially with high order polynomials, this would speed up the predictions made by the algorithm
 
 
 
 \unnum{chapter}{Conclusion}
-\unnum{chapter}{Appendix A}
-\unnum{chapter}{Appendix B}
+The complex Ginzburg Landau equation was solved using a split step Fourier and Runge Kutta method. This was done after various different methods had been explored and was chosen as it was found to be widely used and efficient.\cite{2001, taha, bch}. A range of previously published solitons were successfully replicated including high amplitude pulses and spiny solitons. The Stanford university online course on machine learning was successfully with various techniques being explored in depth. Polynomial regression was chosen to predict properties of solitons, however the only property that could be predicted was the height of stationary solitons which was able to predict an answer within 2\% of the true value for 92\% of the test solitons. The next best was predicting the maximum height for pulsating solitons, ad this was able to get 95\% within 5\% of the true value. Various reasons were explored as to why this may be the case, with the most likely culprit being that some of the solitons would split and propagate in parallel. Ways to overcome this were suggested and other future projects involving machine learning to predict soliton properties were discussed. 
+
+
+
+
+
+\unnum{chapter}{Appendix}
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Polynomial Order & Training Cost & CV Cost\\
+\hline
+4&0.0011&0.00104\\
+5&0.000860&0.000815\\
+6&0.000674&0.000700\\
+7&0.000662&0.000663\\
+8&0.000662&0.000667\\
+\hline
+\end{tabular}
+\\Table 1: Table of cost for the height of stationary solitons.
+\end{center}
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Polynomial Order & Training Cost ($\times 10^7$) & CV Cost($\times 10^7$)\\
+\hline
+4&3.59&3.75\\
+5&3.57&3.76\\
+6&3.54&3.78\\
+\hline
+\end{tabular}
+\\Table 2: Table of cost for the standard deviation of stationary solitons.
+\end{center}
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Polynomial Order & Training Cost & CV Cost\\
+\hline
+4&6.41&7.03\\
+5&5.73&6.49\\
+6&5.40&6.21\\
+7&5.05&6.03\\
+8&4.74&5.55\\
+9&4.72&5.72\\
+\hline
+\end{tabular}
+\\Table 3: Table of cost for the energy of stationary solitons.
+\end{center}
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Polynomial Order & Training Cost & CV Cost\\
+\hline
+3&41.2&56.1\\
+4&33.9&131.9\\%TODO
+5&28.8&85.3\\
+\hline
+\end{tabular}
+\\Table 4: Table of cost for the maximum energy difference of pulsating solitons.
+\end{center}
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Polynomial Order & Training Cost & CV Cost\\
+\hline
+3&5.3&2.3\\
+4&4.6&6.1\\
+5&4.1&6.5\\
+\hline
+\end{tabular}
+\\Table 5: Table of cost for the maximum difference in standard deviation of pulsating solitons.
+\end{center}
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Polynomial Order & Training Cost ($\times 10^7$) & CV Cost($\times 10^7$)\\
+\hline
+3&0.00178&0.00265\\
+4&0.00152&0.00445\\
+5&0.00133&0.00373\\
+6&0.00118&0.00451\\
+\hline
+\end{tabular}
+\\Table 6: Table of cost for the average frequency of pulsating solitons.
+\end{center}
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Polynomial Order & Training Cost & CV Cost\\
+\hline
+3&0.00259&0.00495\\
+4&0.00213&0.00896\\
+5&0.00183&0.00714\\
+6&0.00165&0.00743\\
+\hline
+\end{tabular}
+\\Table 7: Table of cost for the maximum height of pulsating solitons.
+\end{center}
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Polynomial Order & Training Cost  & CV Cost\\
+\hline
+3&30.9&52.5\\
+4&25.2&84.3\\
+5&20.2&75.8\\
+6&17.2&64.9\\
+7&14.8&66.7\\
+\hline
+\end{tabular}
+\\Table 8: Table of cost for the maximum energy of pulsating solitons.
+\end{center}
+\pagebreak
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Polynomial Order & Training Cost ($\times 10^5$) & CV Cost($\times 10^5$)\\
+\hline
+3&510&663\\
+4&454&838\\
+5&417&816\\
+\hline
+\end{tabular}
+\\Table 9: Table of cost for the maximum standard deviation of pulsating solitons.
+\end{center}
+
 
 \begin{thebibliography}{9}
-%Introduction
-\bibitem{RefExample}
-    Name \emph{Title},
-    Publishing info, etc
-\bibitem{Ref2}
-    Another Guy \emph{title2}
-    pub,etc.
-%Derivation of CGLE
-
-%Types of Solitons
-
-%Mathematical theory behind solving CGLE
-
-%Machine Learning
-
-%My solitons
-
-
+\addcontentsline{toc}{chapter}{Bibliography} 
+\bibitem{2001}
+    N. Akhmediev, J. M. Soto-Crespo and G. Town, Phys. Rev. E 63, 056602 (2001)
+\bibitem{taha}
+	T. Taha and M. Ablowitz, Journal of Computational Physics, Volume 55, Issue 2 (1984)
+\bibitem{dissys}
+    K. Porsezian and V.C. Kuriakose, \emph{Optical Solitons: Theoretical and Experimental Challenges}, Springer 2002 (pp116)
+\bibitem{spiny}
+	Wonkeun Chang, Jose M. Soto-Crespo, Peter Vouzas, and Nail Akhmediev, "Spiny solitons and noise-like pulses," J. Opt. Soc. Am. B 32, 1377-1383 (2015)
+\bibitem{spike}
+	Wonkeun Chang, Jose M. Soto-Crespo, Peter Vouzas, and Nail Akhmediev, "Extreme amplitude spikes in a laser model described by the complex Ginzburg–Landau equation," Opt. Lett. 40, 2949-2952 (2015)
+\bibitem{extreme}
+	Wonkeun Chang, Jose M. Soto-Crespo, Peter Vouzas, and Nail Akhmediev
+Phys. Rev. E 92, 022926 (2015)
+\bibitem{5th}
+	J. Moores, Optics Communications 96 (1993) pp65-70
+\bibitem{wocgle}
+	I. Aranson, L. Kramer, Reviews of Modern Physics,, Vol74 (2002) pp99
+\bibitem{boyce}
+	W. Boyce and R, DiPrima \emph{Elementary Differential Equations and Boundary Value Problems} 9th ed. John Wiley \& Sons Inc. (2009) pp459 
+\bibitem{annett}
+	J.Annett, \emph{Superconductivity, Superfluids and Condensates} Oxford University Press (2004) pp67
+\bibitem{hecke}
+	M. van Hecke and W. van Saarloos, \emph{Amplitude equations for pattern forming systems}, from \emph{Fundamental Problems in Statistical Mechanics VIII} (1994).
+\bibitem{exact}
+	Y. Peng and E Krishnan, Commum Math Sci Vol. 5 NO. 2 pp243-252 (2007)
+\bibitem{bch}
+	A. Torcini, H. Frauenkron and P. Grassberger, Physica D Vol. 103 (1997) pp605-610
+\bibitem{mooc}
+A. Ng, Stanford University, \url{https://www.coursera.org/learn/machine-learning}
+	
 \end{thebibliography}
-
 
 \end{document}

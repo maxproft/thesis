@@ -53,6 +53,8 @@ def maxmin(x):
 vmaxmin=np.vectorize(maxmin)
 
 def plot(intensity, title="", name='a'):
+  print("Maximum = " + str(np.max(np.abs(intensity))))
+  print("Minimum = " + str(np.min(np.abs(intensity))))
   if 0:#This saves ALL the data
       np.savetxt(g.solve['currentfolder']+'/'+g.solve['subfolder'] + '/' + str(name)+"_AllData.csv", np.array(intensity).view(float), delimiter=",")
   
@@ -121,8 +123,10 @@ def plot(intensity, title="", name='a'):
         
         np.multiply(temparr,temparr,temparr)
         ylist = np.sum(temparr,axis=1)*dx        
-        xlist = range(len(ylist))
+        xlist = np.linspace(0,1,len(ylist))
         plt.plot(xlist,ylist,'b-')
+        plt.xlabel("t",fontsize=20)
+        plt.ylabel("$\int \ | \psi(x,t) |^2dx$",fontsize=20)
         plt.show()
 
 def make1D():

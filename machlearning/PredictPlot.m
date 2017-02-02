@@ -13,8 +13,12 @@ NewData(3,4)=10;#pred: 1000
 NewData(4,3)=1.5;
 NewData(4,4)=3.5;#pred: 44
 
-NewData(5,3)=1.5;
-NewData(5,4)=30;#pred: 27000
+NewData(5,1)=-0.1;
+NewData(5,2)=0.125;#pred:
+NewData(5,3)=-1;
+NewData(5,4)=0.95;#pred: 
+NewData(5,5)=-0.0005;
+NewData(5,6)=0.1;#pred: 14.3
 
 %load the values computed from machine learning
 machLearnData = load("trainingInfo.csv");
